@@ -1,0 +1,30 @@
+{
+  "name": "slitherlink",
+  "version": "1.0.0",
+  "description": "cooperative slitherlink",
+  "main": "index.js",
+  "scripts": {
+    "production": "webpack -p",
+    "start": "webpack --watch",
+    "server": "node server/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "errorhandler": "^1.5.0",
+    "express": "^4.15.3",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-router": "^4.1.1",
+    "react-router-dom": "^4.1.1",
+    "socketio": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.0",
+    "babel-preset-react": "^6.23.0",
+    "webpack": "^2.2.1",
+    "webpack-livereload-plugin": "^0.10.0"
+  }
+}

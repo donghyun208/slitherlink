@@ -1,0 +1,8 @@
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+.prevent-highlight {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
