@@ -36,10 +36,11 @@ else if ('production' === app.settings.env) {
 app.set('views', __dirname + '/views');
 
 /* Socket.io Communication */
+const persistent_data = {} // replace with database later
 const io = require('socket.io')(server);
-// io.on('connection', (socket) => {
-//   require('./api/socket.js')(socket, io, persistent_data)
-// });
+io.on('connection', (socket) => {
+  require('./api/socket.js')(socket, io, persistent_data)
+});
 
 // the order of the next two lines is important (try to serve static files before redirecting)
 app.use(express.static(__dirname + '/views'));
