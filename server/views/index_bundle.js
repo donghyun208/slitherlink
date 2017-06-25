@@ -9099,34 +9099,122 @@ function error(data){
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Grid__ = __webpack_require__(125);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_immutability_helper__ = __webpack_require__(162);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_immutability_helper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_immutability_helper__);
 
 
 
+
+/**
+  * the Graph class manages game state logic
+  * the majority of socket interaction takes place through Graph
+  * changes to the view due to game state are passed down only through child props
+  *
+  * Use componentWillReceiveProps to enforce that props passed to Graph from Home
+  * stay in sync with Graph's state
+  */
 class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 
   constructor(props) {
     super(props);
+    // this.onClick = this.onClick.bind(this)
+    // this.onMouseOver = this.onMouseOver.bind(this)
+    this.onEdgeClick = this.onEdgeClick.bind(this);
     this.state = {
-      graph: props.data
+      edgeData: {},
+      playerNum: this.props.playerNum
     };
-    this.onClick = this.onClick.bind(this);
-    this.onMouseOver = this.onMouseOver.bind(this);
   }
 
-  onMouseOver() {}
+  componentWillReceiveProps(nextProps) {
+    console.log('updating player in Graph', this.props.playerNum, nextProps.playerNum);
+    if (this.props.playerNum != nextProps.playerNum) {
+      this.setState({
+        playerNum: nextProps.playerNum
+      });
+    }
+  }
 
-  onClick() {}
+  componentDidMount() {
+    this.initSockets();
+  }
+
+  updateEdgeData(newEdgeData) {
+    let data = __WEBPACK_IMPORTED_MODULE_2_immutability_helper___default()(this.state.edgeData, { $merge: newEdgeData });
+    // merge new data with old state before updateing otherwise it erases all the old keys
+    this.setState({
+      edgeData: data
+    });
+  }
+
+  initSockets() {
+    this.socket = this.context.socket;
+    this.socket.on('updateBoard', data => {
+      console.log('updating board ', data);
+      console.log('edge data', data.edgeData);
+      this.updateEdgeData(data.edgeData);
+    });
+  }
+
+  onEdgeClick(x, y) {
+    let key = String([x, y]);
+    return e => {
+      let clickState;
+      if (key in this.state.edgeData) {
+        clickState = this.state.edgeData[key].click;
+      } else {
+        clickState = 0;
+      }
+      console.log('clicked', key, clickState);
+      let newClickState = null;
+
+      let clickType = e.nativeEvent.which;
+      if (clickType === 1) {
+        if (clickState === 1) {
+          newClickState = 0;
+        } else {
+          newClickState = 1;
+        }
+      } else if (clickType === 3) {
+        if (clickState === 2) {
+          newClickState = 0;
+        } else {
+          newClickState = 2;
+        }
+      } else {
+        return;
+      }
+
+      let updatedSegment = { 'edgeData': {} };
+      updatedSegment.edgeData[key] = { click: newClickState,
+        owner: this.state.playerNum };
+      this.updateEdgeData(updatedSegment);
+
+      console.log('checking playaernum', this.state.playerNum);
+      this.socket.emit('updateEdge', {
+        key: key,
+        click: newClickState,
+        playerNum: this.state.playerNum
+      });
+    };
+  }
 
   render() {
-    return (
-      // <div className="col-centered" style={{float: "none", margin: "0 auto"}}>
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'div',
+      { className: 'col-8', style: { float: "none", margin: "0 auto" } },
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.props.problem, solution: '', edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick }),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'div',
-        { className: 'col-8', style: { float: "none", margin: "0 auto" } },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.state.graph, solution: '', graph: "" })
+        'h3',
+        null,
+        this.props.playerNum
       )
     );
   }
+};
+
+Graph.contextTypes = {
+  socket: __WEBPACK_IMPORTED_MODULE_0_react___default.a.PropTypes.object
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (Graph);
@@ -15107,19 +15195,26 @@ class Edge extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Edge__ = __webpack_require__(124);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_immutability_helper__ = __webpack_require__(162);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_immutability_helper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_immutability_helper__);
 
 
 
+const colorMap = {
+  0: 'black',
+  1: 'blue',
+  2: 'purple',
+  3: 'green',
+  4: 'red'
 
-class Grid extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
+  /**
+    * the Grid class renders the slitherlink board
+    */
+};class Grid extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   constructor(props) {
     super(props);
 
     this.problem = props.problem;
     this.solution = props.solution;
-    this.graph = props.graph;
+    // this.graph = props.graph
     let numY = this.problem.length;
     let numX = this.problem[0].length;
     this.xOffset = 1;
@@ -15130,82 +15225,12 @@ class Grid extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor;
     this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor;
     this.constructGrid(numX, numY, this.problem);
-    this.onEdgeClick = this.onEdgeClick.bind(this);
-  }
-
-  componentDidMount() {
-    this.initSockets();
-  }
-
-  initSockets() {
-    this.socket = this.context.socket;
-
-    // this.socket.on('starting', () => {
-    //   this.alarmStart.play();
-    //   this.startingTime = Date.now()
-    //   this.setState({started: true})
-    //   this.setTitle()
-    //   if (this.state.selectedTime !== '5') {
-    //     this.checkLocalStorageStart()
-    //   }
-    // })
-
-    // this.socket.on('pausing', (data) => {
-    //   this.setState({
-    //     paused: data.paused,
-    //     time: data.time
-    //   })
-    //   this.setTitle()
-    // })
-
-    // this.socket.on('updating', (data) => {
-    //   console.log('updating')
-    //   this.setState({
-    //     time: data.time,
-    //     started: data.started,
-    //     paused: data.paused,
-    //     totTime: data.totTime,
-    //     selectedTime: String(data.totTime / (60 * 1000)),
-    //     numConnected: data.numConnected,
-    //   })
-    //   this.setTitle()
-    // })
-  }
-
-  onEdgeClick(x, y) {
-    let key = String([x, y]);
-    return e => {
-      let clickState = this.state[key].click;
-      let edgeData = this.state[key];
-      let newClickState = null;
-
-      let clickType = e.nativeEvent.which;
-      if (clickType === 1) {
-        if (clickState === 1) {
-          newClickState = 0;
-        } else {
-          newClickState = 1;
-        }
-      } else if (clickType === 3) {
-        if (clickState === 2) {
-          newClickState = 0;
-        } else {
-          newClickState = 2;
-        }
-      } else {
-        return;
-      }
-      console.log(clickType, newClickState);
-
-      let newObj = {};
-      newObj[key] = __WEBPACK_IMPORTED_MODULE_2_immutability_helper___default()(edgeData, { click: { $set: newClickState } });
-      this.setState(newObj);
-    };
   }
 
   constructGrid(numX, numY, problem) {
     /*
-    Use the following coordinate system to help construct the grid:
+    This method only runs once! (called from the constructor)
+      Use the following coordinate system to help construct the grid:
       consider all integer valued pairs (x,y) for x in range(0 to 2*numX) and y in range(0 to 2*numY)
       every point where both (x,y) are even will be a vertex
     every point where only one of (x,y) is even will be an edge
@@ -15236,16 +15261,6 @@ class Grid extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       }
     }
 
-    let edgeData = {};
-    this.state = {};
-    for (let [i, [x, y]] of this.edgeList.entries()) {
-      this.state[[x, y]] = {
-        click: 0,
-        owner: 0,
-        firstHover: true
-      };
-    }
-
     this.vertexSVG = [];
     let radius = 1 / 8;
     for (let [i, [x, y]] of this.vertexList.entries()) {
@@ -15271,23 +15286,37 @@ class Grid extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     let halfLength = 0.8;
     for (let [i, [x, y]] of this.edgeList.entries()) {
       let vertical = x % 2 ? false : true;
+      let key = String([x, y]);
+      let thisEdge;
+      if (key in this.props.edgeData) {
+        thisEdge = this.props.edgeData[key];
+      } else {
+        thisEdge = {
+          owner: 0,
+          click: 0
+        };
+      }
       this.edgeSVG.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Edge__["a" /* default */], { x: x, y: y, vertical: vertical, halfLength: halfLength, crossMarkSize: 0.15,
-        clickState: this.state[[x, y]].click, onClick: this.onEdgeClick(x, y), color: 'red', key: i }));
+        clickState: thisEdge.click, onClick: this.props.onClickWrapper(x, y), color: colorMap[thisEdge.owner], key: i }));
     }
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'svg',
-      { width: this.svgWidth + "px", height: this.svgHeight + "px", onContextMenu: e => {
-          e.preventDefault();
-        },
-        onMouseUp: this.resetHover },
+      'div',
+      null,
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'g',
-        { className: 'prevent-highlight',
-          transform: "scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset + ")" },
-        this.vertexSVG,
-        this.faceSVG,
-        this.edgeSVG
+        'svg',
+        { width: this.svgWidth + "px", height: this.svgHeight + "px", onContextMenu: e => {
+            e.preventDefault();
+          },
+          onMouseUp: this.resetHover },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'g',
+          { className: 'prevent-highlight',
+            transform: "scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset + ")" },
+          this.vertexSVG,
+          this.faceSVG,
+          this.edgeSVG
+        )
       )
     );
   }
@@ -15317,9 +15346,9 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   constructor(props) {
     super(props);
     this.state = {
-      problem: ''
+      problem: '',
+      playerNum: 0
     };
-    console.log('first', this.state.problem);
   }
 
   componentDidMount() {
@@ -15330,7 +15359,7 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     this.socket = this.context.socket;
     console.log("try to connect socket");
     this.socket.on("connect", () => {
-      this.socket.emit('roomID', this.roomID, data => {
+      this.socket.emit('roomID', this.props.match.params.roomID, data => {
         console.log("Connected!", data);
         this.roomID = data.id;
         this.setState({
@@ -15339,14 +15368,20 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         this.props.history.push('/' + this.roomID);
       });
     });
+
+    this.socket.on("playerInfo", data => {
+      console.log('got player info', data);
+      this.setState({
+        playerNum: data.num
+      });
+    });
   }
 
   render() {
-    console.log(this.state.problem);
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       null,
-      this.state.problem && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Graph__["a" /* default */], { data: this.state.problem })
+      this.state.problem && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Graph__["a" /* default */], { problem: this.state.problem, playerNum: this.state.playerNum })
     );
   }
 };

@@ -1,15 +1,24 @@
 import React, { PropTypes, Component } from 'react'
 import Edge from './Edge';
-import update from 'immutability-helper';
 
+const colorMap = {
+  0: 'black',
+  1: 'blue',
+  2: 'purple',
+  3: 'green',
+  4: 'red'
+}
 
+/**
+  * the Grid class renders the slitherlink board
+  */
 class Grid extends Component {
   constructor(props) {
     super(props);
 
     this.problem = props.problem
     this.solution = props.solution
-    this.graph = props.graph
+    // this.graph = props.graph
     let numY = this.problem.length
     let numX = this.problem[0].length
     this.xOffset = 1
@@ -20,86 +29,12 @@ class Grid extends Component {
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
     this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor
     this.constructGrid(numX, numY, this.problem)
-    this.onEdgeClick = this.onEdgeClick.bind(this)
   }
-
-  componentDidMount() {
-    this.initSockets()
-  }
-
-  initSockets() {
-    this.socket = this.context.socket
-
-    // this.socket.on('starting', () => {
-    //   this.alarmStart.play();
-    //   this.startingTime = Date.now()
-    //   this.setState({started: true})
-    //   this.setTitle()
-    //   if (this.state.selectedTime !== '5') {
-    //     this.checkLocalStorageStart()
-    //   }
-    // })
-
-    // this.socket.on('pausing', (data) => {
-    //   this.setState({
-    //     paused: data.paused,
-    //     time: data.time
-    //   })
-    //   this.setTitle()
-    // })
-
-    // this.socket.on('updating', (data) => {
-    //   console.log('updating')
-    //   this.setState({
-    //     time: data.time,
-    //     started: data.started,
-    //     paused: data.paused,
-    //     totTime: data.totTime,
-    //     selectedTime: String(data.totTime / (60 * 1000)),
-    //     numConnected: data.numConnected,
-    //   })
-    //   this.setTitle()
-    // })
-  }
-
-  onEdgeClick(x,y) {
-    let key = String([x,y])
-    return (e) => {
-      let clickState = this.state[key].click
-      let edgeData = this.state[key]
-      let newClickState = null
-
-      let clickType = e.nativeEvent.which
-      if (clickType === 1) {
-        if (clickState === 1) {
-          newClickState = 0
-        }
-        else {
-          newClickState = 1
-        }
-      }
-      else if (clickType === 3) {
-        if (clickState === 2) {
-          newClickState = 0
-        }
-        else {
-          newClickState = 2
-        }
-      }
-      else {
-        return
-      }
-      console.log(clickType, newClickState)
-
-      let newObj = {}
-      newObj[key] = update(edgeData, {click: {$set: newClickState}})
-      this.setState(newObj)
-    }
-  }
-
 
   constructGrid(numX, numY, problem) {
     /*
+    This method only runs once! (called from the constructor)
+
     Use the following coordinate system to help construct the grid:
 
     consider all integer valued pairs (x,y) for x in range(0 to 2*numX) and y in range(0 to 2*numY)
@@ -135,17 +70,6 @@ class Grid extends Component {
       }
     }
 
-    let edgeData = {}
-    this.state = {}
-    for (let [i, [x,y]] of this.edgeList.entries()) {
-      this.state[[x,y]] = {
-        click: 0,
-        owner: 0,
-        firstHover: true
-      }
-    }
-
-
     this.vertexSVG = []
     let radius = 1 / 8
     for (let [i, [x,y]] of this.vertexList.entries()) {
@@ -168,11 +92,23 @@ class Grid extends Component {
     let halfLength = 0.8
     for (let [i, [x,y]] of this.edgeList.entries()) {
       let vertical = x % 2 ? false : true
+      let key = String([x,y])
+      let thisEdge;
+      if (key in this.props.edgeData) {
+        thisEdge = this.props.edgeData[key]
+      }
+      else {
+        thisEdge = {
+          owner: 0,
+          click: 0
+        }
+      }
       this.edgeSVG.push(<Edge x={x} y={y} vertical={vertical} halfLength={halfLength} crossMarkSize={0.15}
-        clickState={this.state[[x,y]].click} onClick={this.onEdgeClick(x,y)} color={'red'} key={i}></Edge>)
+        clickState={thisEdge.click} onClick={this.props.onClickWrapper(x,y)} color={colorMap[thisEdge.owner]} key={i}></Edge>)
     }
 
     return (
+      <div>
       <svg width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}
         onMouseUp={this.resetHover}>
         <g className="prevent-highlight"
@@ -182,6 +118,7 @@ class Grid extends Component {
           {this.edgeSVG}
         </g>
       </svg>
+      </div>
     );
   }
 };

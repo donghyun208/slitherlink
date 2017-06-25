@@ -7,9 +7,9 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      problem: ''
+      problem: '',
+      playerNum: 0
     }
-    console.log('first', this.state.problem)
   }
 
   componentDidMount() {
@@ -20,7 +20,7 @@ class Home extends Component {
     this.socket = this.context.socket
     console.log("try to connect socket");
     this.socket.on("connect", () => {
-      this.socket.emit('roomID', this.roomID, (data) => {
+      this.socket.emit('roomID', this.props.match.params.roomID, (data) => {
         console.log("Connected!", data);
         this.roomID = data.id
         this.setState({
@@ -30,16 +30,20 @@ class Home extends Component {
       })
     });
 
+    this.socket.on("playerInfo", (data) => {
+      console.log('got player info', data)
+      this.setState({
+        playerNum: data.num
+      })
+    })
+
   }
 
-
-
   render() {
-    console.log(this.state.problem)
     return (
       <div>
         { this.state.problem &&
-          <Graph data={this.state.problem}/>
+          <Graph problem={this.state.problem} playerNum={this.state.playerNum}/>
         }
       </div>
     );
