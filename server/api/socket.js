@@ -61,7 +61,7 @@ module.exports = (socket, io, roomList) => {
       console.log('emit playerInfo', playerData)
       console.log(currRoom)
       // console.log(roomList)
-      console.log(roomID in roomList)
+      // console.log(roomID in roomList)
     }
     cb(currRoom)
     io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
