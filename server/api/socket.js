@@ -17,6 +17,7 @@ let colorMap = {
 
 function loadPuzzles() {
   var filepath = path.join(__dirname + '/../config/puzzles.txt')
+  // var filepath = path.join(__dirname + '/../config/puzzles_debug.txt')
   let data = fs.readFileSync(filepath, {encoding: 'utf-8'})
   let puzzles = data.split('~')
   return puzzles
@@ -60,7 +61,7 @@ module.exports = (socket, io, roomList) => {
     }
     currRoom = roomList[roomID];
     currRoom.numConnected += 1;
-    let playerNum = currRoom.numConnected
+    let playerNum = currRoom.numConnected // TODO: modify this to assign each user some persistent ID
     currRoom.players[socket.id] = playerNum
 
     let playerData = {
@@ -81,77 +82,73 @@ module.exports = (socket, io, roomList) => {
     console.log('edge ', data.key, ' clicked by ', data.playerNum)
     currRoom.edgeData[data.key] = {
       click: data.click,
-      owner: data.playerNum
+      owner: data.playerNum,
+      soln: data.soln
     }
     io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
   })
-
-  // socket.on('start', () => {
-  //   console.log(currRoom.id + ' is starting')
-  //   io.sockets.in(currRoom.id).emit('starting');
-  //   currRoom.started = true;
-  //   currRoom.timeStart = Date.now();
-  // })
-
-  // socket.on('pause', () => {
-  //   updateTimer(currRoom)
-  //   currRoom.paused = !currRoom.paused
-  //   io.sockets.in(currRoom.id).emit('pausing', currRoom);
-
-  //   if (!currRoom.paused ) {
-  //     console.log(currRoom + 'paused')
-  //   }
-  //   else {
-  //     console.log(currRoom + 'resumed')
-  //   }
-
-  // })
-
-  // socket.on('reset', () => {
-  //   console.log('reseting room')
-  //   resetRoom(currRoom)
-  //   io.sockets.in(currRoom.id).emit('updating', currRoom);
-  // })
-
-  // socket.on('changeTime', (newTime) => {
-  //   let newTimeMS = parseFloat(newTime) * 60 * 1000;
-  //   currRoom.totTime = newTimeMS
-  //   resetRoom(currRoom)
-  //   io.sockets.in(currRoom.id).emit('updating', currRoom);
-  // })
-
-  // socket.on('syncRoom', () => {
-  //   updateTimer(currRoom)
-  //   socket.emit('updating', currRoom);
-  // })
-
 };
 
+function parsePuzzle(puzzle) {
+  puzzle = puzzle.split(',')
+  // console.log(puzzle)
 
-function readTextFile(file) {
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status == 0)
-            {
-                var allText = rawFile.responseText;
-                fileDisplayArea.innerText = allText
-            }
-        }
+  // CONSTRUCT PROBLEM
+  let problem = []
+  for (let i=0; i<puzzle.length; i++) {
+    if (i % 2 == 1){
+      let newStr = puzzle[i].replace(/\s/g,'')
+      newStr = newStr.replace(/\|/g, '')
+      problem.push(newStr)
     }
-    rawFile.send(null);
+  }
+
+  // CONSTRUCT SOLUTION AND ADD EDGE DATA
+  let edgeData = {}
+  let xList = []
+  let yList = []
+
+  let numRows = (puzzle.length - 1 ) / 2
+  let numCols = (puzzle[0].length - 1 ) / 2
+  for (let i=0; i <= 2 * numCols; i++) {
+    xList.push(i)
+  }
+  for (let i=0; i <= 2 * numRows; i++) {
+    yList.push(i)
+  }
+  // this.edgeList = []
+  // this.vertexList = []
+  // this.centerList = []
+
+  for (let y=0; y<puzzle.length; y++) {
+    let row = puzzle[y]
+    for (let x=0; x<row.length; x++) {
+      if (x % 2 != y % 2) {
+        let soln = row[x] == ' ' ? 0:1
+        edgeData[String([x,y])] = {
+          owner: 0,
+          click: 0,
+          soln: soln
+        }
+      }
+    }
+  }
+
+  return {
+    edgeData: edgeData,
+    problem: problem.join(',')
+  }
 }
 
 function generateNewRoom() {
+  let puzzle = getRandomPuzzle()
+  let data = parsePuzzle(puzzle)
   return {
     id: idGen(),
     numConnected: 0,
     players: {},
-    edgeData: {},
-    puzzle: getRandomPuzzle()
+    edgeData: data.edgeData,
+    problem: data.problem
   }
 }
 

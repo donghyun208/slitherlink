@@ -9099,8 +9099,10 @@ function error(data){
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Grid__ = __webpack_require__(125);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_immutability_helper__ = __webpack_require__(162);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_immutability_helper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_immutability_helper__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PlayerStats__ = __webpack_require__(285);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_immutability_helper__ = __webpack_require__(162);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_immutability_helper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_immutability_helper__);
+
 
 
 
@@ -9128,12 +9130,25 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     // this.onClick = this.onClick.bind(this)
     // this.onMouseOver = this.onMouseOver.bind(this)
     this.onEdgeClick = this.onEdgeClick.bind(this);
-    let data = this.parsePuzzle(this.props.puzzle);
+    // let data = this.parsePuzzle(this.props.puzzle)
+    // console.log('init edgeData', data.edgeData)
+    let totSoln = 0;
+    for (let key in this.props.edgeData) {
+      totSoln += this.props.edgeData[key].soln;
+    }
+    console.log(this.props.problem);
+
+    let initStats = {};
+    initStats[this.props.playerNum] = {
+      numClick: 0
+    };
     this.state = {
-      edgeData: {},
       playerNum: this.props.playerNum,
-      problem: data.problem,
-      solution: data.solution
+      edgeData: this.props.edgeData,
+      problem: this.props.problem,
+      totSoln: totSoln,
+      completed: false,
+      playerStats: initStats
     };
   }
 
@@ -9144,33 +9159,17 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         playerNum: nextProps.playerNum
       });
     }
-    if (this.props.puzzle != nextProps.puzzle) {
-      let data = this.parsePuzzle(this.props.puzzle);
+    let totSoln = 0;
+    for (let key in this.props.edgeData) {
+      totSoln += this.props.edgeData[key].soln;
+    }
+    if (this.props.problem != nextProps.problem) {
       this.setState({
-        problem: data.problem,
-        solution: data.solution
+        problem: this.props.problem,
+        edgeData: this.props.edgeData,
+        totSoln: totSoln
       });
     }
-  }
-
-  parsePuzzle(puzzle) {
-    console.log('received puzzle');
-    puzzle = puzzle.split(',');
-    // console.log(puzzle)
-    // let numRows = (puzzle.length - 1 ) / 2
-    // let numCols = (puzzle[0].length - 1 ) / 2
-    let problem = [];
-    for (let i = 0; i < puzzle.length; i++) {
-      if (i % 2 == 1) {
-        let newStr = puzzle[i].replace(/\s/g, '');
-        newStr = newStr.replace(/\|/g, '');
-        problem.push(newStr);
-      }
-    }
-    return {
-      problem: problem,
-      solution: puzzle
-    };
   }
 
   componentDidMount() {
@@ -9178,11 +9177,51 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   }
 
   updateEdgeData(newEdgeData) {
+    console.log('updating edgeData', newEdgeData);
     // merge new data with old state before updateing otherwise it erases all the old keys
-    let edgeData = __WEBPACK_IMPORTED_MODULE_2_immutability_helper___default()(this.state.edgeData, { $merge: newEdgeData });
 
+    // check if puzzle is correct
+    let edgeData = __WEBPACK_IMPORTED_MODULE_3_immutability_helper___default()(this.state.edgeData, { $merge: newEdgeData });
     this.setState({
       edgeData: edgeData
+    });
+    let currSoln = 0;
+    let playerStats = {};
+    for (let key in edgeData) {
+      let owner = edgeData[key].owner;
+      if (owner > 0) {
+        // console.log('owner', owner, edgeData[key].click, owner in playerStats)
+        if (!(owner in playerStats)) {
+          playerStats[owner] = {
+            numClick: 0
+          };
+        }
+        if (edgeData[key].click == 1) {
+          playerStats[owner].numClick += 1;
+          // console.log('up click')
+        }
+      }
+      if (currSoln != -1) {
+        if (edgeData[key].soln == 0 && edgeData[key].click == 1) {
+          currSoln = -1;
+        }
+        if (edgeData[key].soln == 1 && edgeData[key].click == 1) {
+          currSoln += 1;
+        }
+      }
+    }
+    // console.log(currSoln, this.state.totSoln)
+    if (currSoln == this.state.totSoln) {
+      this.setState({
+        completed: true
+      });
+    } else {
+      this.setState({
+        completed: false
+      });
+    }
+    this.setState({
+      playerStats: playerStats
     });
   }
 
@@ -9199,6 +9238,7 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     let key = String([x, y]);
     return e => {
       let clickState;
+      let solnState = this.state.edgeData[key].soln;
       if (key in this.state.edgeData) {
         clickState = this.state.edgeData[key].click;
       } else {
@@ -9226,27 +9266,47 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
 
       let updatedSegment = { 'edgeData': {} };
       updatedSegment.edgeData[key] = { click: newClickState,
-        owner: this.state.playerNum };
+        owner: this.state.playerNum,
+        soln: solnState };
       this.updateEdgeData(updatedSegment);
 
-      console.log('checking playaernum', this.state.playerNum);
+      console.log('checking playernum', this.state.playerNum);
       this.socket.emit('updateEdge', {
         key: key,
         click: newClickState,
-        playerNum: this.state.playerNum
+        playerNum: this.state.playerNum,
+        soln: solnState
       });
     };
   }
 
+  // <div className="col-8" style={{float: "none", margin: "0 auto"}}>
   render() {
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
-      { className: 'col-8', style: { float: "none", margin: "0 auto" } },
-      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.state.problem, solution: this.state.solution, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick }),
+      { className: 'row' },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'h3',
-        null,
-        this.props.playerNum
+        'div',
+        { className: 'offset-1 col-7' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'text-center' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.state.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick }),
+          this.state.completed && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'h3',
+            null,
+            'Complete'
+          )
+        )
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { className: 'col-3' },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          'div',
+          { className: 'text-center' },
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__PlayerStats__["a" /* default */], { playerStats: this.state.playerStats })
+        )
       )
     );
   }
@@ -15251,9 +15311,8 @@ const colorMap = {
   constructor(props) {
     super(props);
 
-    this.problem = props.problem;
-    this.solution = props.solution;
-    // this.graph = props.graph
+    this.problem = props.problem.split(',');
+    console.log(this.problem);
     let numY = this.problem.length;
     let numX = this.problem[0].length;
     this.xOffset = 1;
@@ -15264,6 +15323,9 @@ const colorMap = {
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor;
     this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor;
     this.constructGrid(numX, numY, this.problem);
+  }
+  componentWillReceiveProps(nextProps) {
+    // may need to update this if problem changes
   }
 
   constructGrid(numX, numY, problem) {
@@ -15308,7 +15370,7 @@ const colorMap = {
 
     this.faceSVG = [];
     for (let [i, [x, y]] of this.centerList.entries()) {
-      let symbol = problem[(x - 1) / 2][numY - 1 - (y - 1) / 2];
+      let symbol = problem[(y - 1) / 2][(x - 1) / 2];
       if (symbol != '.') {
         this.faceSVG.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'text',
@@ -15326,36 +15388,24 @@ const colorMap = {
     for (let [i, [x, y]] of this.edgeList.entries()) {
       let vertical = x % 2 ? false : true;
       let key = String([x, y]);
-      let thisEdge;
-      if (key in this.props.edgeData) {
-        thisEdge = this.props.edgeData[key];
-      } else {
-        thisEdge = {
-          owner: 0,
-          click: 0
-        };
-      }
+      let thisEdge = this.props.edgeData[key];
       this.edgeSVG.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Edge__["a" /* default */], { x: x, y: y, vertical: vertical, halfLength: halfLength, crossMarkSize: 0.15,
         clickState: thisEdge.click, onClick: this.props.onClickWrapper(x, y), color: colorMap[thisEdge.owner], key: i }));
     }
 
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      'div',
-      null,
+      'svg',
+      { width: this.svgWidth + "px", height: this.svgHeight + "px", onContextMenu: e => {
+          e.preventDefault();
+        },
+        onMouseUp: this.resetHover },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        'svg',
-        { width: this.svgWidth + "px", height: this.svgHeight + "px", onContextMenu: e => {
-            e.preventDefault();
-          },
-          onMouseUp: this.resetHover },
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'g',
-          { className: 'prevent-highlight',
-            transform: "scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset + ")" },
-          this.vertexSVG,
-          this.faceSVG,
-          this.edgeSVG
-        )
+        'g',
+        { className: 'prevent-highlight',
+          transform: "scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset + ")" },
+        this.vertexSVG,
+        this.faceSVG,
+        this.edgeSVG
       )
     );
   }
@@ -15385,7 +15435,7 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   constructor(props) {
     super(props);
     this.state = {
-      puzzle: '',
+      problem: null,
       playerNum: 0
     };
   }
@@ -15402,7 +15452,8 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         console.log("Connected!", data);
         this.roomID = data.id;
         this.setState({
-          puzzle: parsePuzzle(data.puzzle)
+          problem: data.problem,
+          edgeData: data.edgeData
         });
         this.props.history.push('/' + this.roomID);
       });
@@ -15420,14 +15471,10 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       null,
-      this.state.puzzle && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Graph__["a" /* default */], { puzzle: this.state.puzzle, playerNum: this.state.playerNum })
+      this.state.problem && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Graph__["a" /* default */], { problem: this.state.problem, edgeData: this.state.edgeData, playerNum: this.state.playerNum })
     );
   }
 };
-
-function parsePuzzle(puzzle) {
-  return puzzle;
-}
 
 Home.contextTypes = {
   socket: __WEBPACK_IMPORTED_MODULE_0_react___default.a.PropTypes.object
@@ -35143,6 +35190,70 @@ module.exports = __webpack_amd_options__;
 
 module.exports = __webpack_require__(121);
 
+
+/***/ }),
+/* 285 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+
+// import Edge from './Edge';
+
+const colorMap = {
+  0: 'black',
+  1: 'blue',
+  2: 'purple',
+  3: 'green',
+  4: 'red'
+};
+
+class PlayerStats extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
+  constructor(props) {
+    super(props);
+  }
+  componentWillReceiveProps(nextProps) {
+    // may need to update this if problem changes
+    console.log(nextProps);
+  }
+
+  // <span key={{player}}>
+  //   <i className="fa fa-user" aria-hidden="true" style={{color:color}}></i>
+  //   <h4>{stats.numClick}</h4>
+  // </span>
+  render() {
+    // console.log('rendering PlayerStats', this.props.playerStats)
+    let statsList = [];
+    for (let player in this.props.playerStats) {
+      let stats = this.props.playerStats[player];
+      let color = colorMap[player];
+      statsList.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        { key: player },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-user', 'aria-hidden': 'true', style: { color: color } }),
+        ' \xA0 ',
+        stats.numClick
+      ));
+    }
+    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      'div',
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h3',
+        null,
+        'Player Stats'
+      ),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'h4',
+        null,
+        statsList
+      )
+    );
+  }
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (PlayerStats);
 
 /***/ })
 /******/ ]);

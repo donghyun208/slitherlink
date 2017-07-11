@@ -7,7 +7,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      puzzle: '',
+      problem: null,
       playerNum: 0
     }
   }
@@ -24,7 +24,8 @@ class Home extends Component {
         console.log("Connected!", data);
         this.roomID = data.id
         this.setState({
-          puzzle: parsePuzzle(data.puzzle)
+          problem: data.problem,
+          edgeData: data.edgeData
         })
         this.props.history.push('/' + this.roomID)
       })
@@ -42,17 +43,13 @@ class Home extends Component {
   render() {
     return (
       <div>
-        { this.state.puzzle &&
-          <Graph puzzle={this.state.puzzle} playerNum={this.state.playerNum}/>
+        { this.state.problem &&
+          <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerNum={this.state.playerNum}/>
         }
       </div>
     );
   }
 };
-
-function parsePuzzle(puzzle) {
-  return puzzle
-}
 
 Home.contextTypes = {
   socket: React.PropTypes.object

@@ -1,5 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import Grid from './Grid';
+import PlayerStats from './PlayerStats';
 import update from 'immutability-helper';
 
 /**
@@ -25,12 +26,25 @@ class Graph extends Component {
     // this.onClick = this.onClick.bind(this)
     // this.onMouseOver = this.onMouseOver.bind(this)
     this.onEdgeClick = this.onEdgeClick.bind(this)
-    let data = this.parsePuzzle(this.props.puzzle)
+    // let data = this.parsePuzzle(this.props.puzzle)
+    // console.log('init edgeData', data.edgeData)
+    let totSoln = 0
+    for (let key in this.props.edgeData) {
+      totSoln += this.props.edgeData[key].soln
+    }
+    console.log(this.props.problem)
+
+    let initStats = {}
+    initStats[this.props.playerNum] = {
+      numClick: 0
+    }
     this.state = {
-      edgeData: {},
       playerNum: this.props.playerNum,
-      problem: data.problem,
-      solution: data.solution
+      edgeData: this.props.edgeData,
+      problem: this.props.problem,
+      totSoln: totSoln,
+      completed: false,
+      playerStats: initStats
     }
   }
 
@@ -41,34 +55,18 @@ class Graph extends Component {
         playerNum: nextProps.playerNum
       })
     }
-    if (this.props.puzzle != nextProps.puzzle) {
-      let data = this.parsePuzzle(this.props.puzzle)
+    let totSoln = 0
+    for (let key in this.props.edgeData) {
+      totSoln += this.props.edgeData[key].soln
+    }
+    if (this.props.problem != nextProps.problem) {
       this.setState({
-        problem: data.problem,
-        solution: data.solution
+        problem: this.props.problem,
+        edgeData: this.props.edgeData,
+        totSoln: totSoln
       })
     }
 
-  }
-
-  parsePuzzle(puzzle){
-    console.log('received puzzle')
-    puzzle = puzzle.split(',')
-    // console.log(puzzle)
-    // let numRows = (puzzle.length - 1 ) / 2
-    // let numCols = (puzzle[0].length - 1 ) / 2
-    let problem = []
-    for (let i=0; i<puzzle.length; i++) {
-      if (i % 2 == 1){
-        let newStr = puzzle[i].replace(/\s/g,'')
-        newStr = newStr.replace(/\|/g, '')
-        problem.push(newStr)
-      }
-    }
-    return {
-      problem: problem,
-      solution: puzzle
-    }
 
   }
 
@@ -77,12 +75,55 @@ class Graph extends Component {
   }
 
   updateEdgeData(newEdgeData) {
+    console.log('updating edgeData', newEdgeData)
     // merge new data with old state before updateing otherwise it erases all the old keys
-    let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
 
+    // check if puzzle is correct
+    let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
     this.setState({
       edgeData: edgeData
     })
+    let currSoln = 0
+    let playerStats = {}
+    for (let key in edgeData) {
+      let owner = edgeData[key].owner
+      if (owner > 0) {
+        // console.log('owner', owner, edgeData[key].click, owner in playerStats)
+        if (!(owner in playerStats)) {
+          playerStats[owner] = {
+            numClick: 0
+          }
+        }
+        if (edgeData[key].click == 1) {
+          playerStats[owner].numClick += 1
+          // console.log('up click')
+        }
+      }
+      if (currSoln != -1 ) {
+        if (edgeData[key].soln == 0 && edgeData[key].click == 1){
+          currSoln = -1
+        }
+        if (edgeData[key].soln == 1 && edgeData[key].click == 1){
+          currSoln += 1
+        }
+      }
+    }
+    // console.log(currSoln, this.state.totSoln)
+    if (currSoln == this.state.totSoln) {
+      this.setState({
+        completed: true
+      })
+    }
+    else {
+      this.setState({
+        completed: false
+      })
+    }
+    this.setState({
+      playerStats: playerStats
+    })
+
+
   }
 
   initSockets() {
@@ -98,6 +139,7 @@ class Graph extends Component {
     let key = String([x,y])
     return (e) => {
       let clickState
+      let solnState = this.state.edgeData[key].soln
       if (key in this.state.edgeData) {
         clickState = this.state.edgeData[key].click
       }
@@ -130,24 +172,38 @@ class Graph extends Component {
 
       let updatedSegment = {'edgeData': {}}
       updatedSegment.edgeData[key] = {click: newClickState,
-                                      owner: this.state.playerNum}
+                                      owner: this.state.playerNum,
+                                      soln:  solnState}
       this.updateEdgeData(updatedSegment)
 
-      console.log('checking playaernum', this.state.playerNum)
+      console.log('checking playernum', this.state.playerNum)
       this.socket.emit('updateEdge', {
         key: key,
         click: newClickState,
-        playerNum: this.state.playerNum
+        playerNum: this.state.playerNum,
+        soln: solnState
       })
     }
   }
 
+      // <div className="col-8" style={{float: "none", margin: "0 auto"}}>
   render() {
     return (
-      <div className="col-8" style={{float: "none", margin: "0 auto"}}>
-        <Grid problem={this.state.problem} solution={this.state.solution} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
-        </Grid>
-        <h3>{this.props.playerNum}</h3>
+      <div className="row">
+        <div className="offset-1 col-7">
+          <div className="text-center">
+            <Grid problem={this.state.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
+            </Grid>
+            { this.state.completed &&
+              <h3>Complete</h3>
+            }
+          </div>
+        </div>
+        <div className="col-3">
+          <div className="text-center">
+            <PlayerStats playerStats={this.state.playerStats}></PlayerStats>
+          </div>
+        </div>
       </div>
     );
   }

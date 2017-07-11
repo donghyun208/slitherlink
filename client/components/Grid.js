@@ -16,9 +16,8 @@ class Grid extends Component {
   constructor(props) {
     super(props);
 
-    this.problem = props.problem
-    this.solution = props.solution
-    // this.graph = props.graph
+    this.problem = props.problem.split(',')
+    console.log(this.problem)
     let numY = this.problem.length
     let numX = this.problem[0].length
     this.xOffset = 1
@@ -29,6 +28,9 @@ class Grid extends Component {
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
     this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor
     this.constructGrid(numX, numY, this.problem)
+  }
+  componentWillReceiveProps(nextProps) {
+    // may need to update this if problem changes
   }
 
   constructGrid(numX, numY, problem) {
@@ -78,7 +80,7 @@ class Grid extends Component {
 
     this.faceSVG = []
     for (let [i, [x,y]] of this.centerList.entries()) {
-      let symbol = problem[(x-1)/2][numY - 1 - (y-1)/2]
+      let symbol = problem[(y-1)/2][(x-1)/2]
       if (symbol != '.') {
         this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1" textAnchor="middle" alignmentBaseline="middle"
           key={i}>{symbol}</text>)
@@ -93,22 +95,12 @@ class Grid extends Component {
     for (let [i, [x,y]] of this.edgeList.entries()) {
       let vertical = x % 2 ? false : true
       let key = String([x,y])
-      let thisEdge;
-      if (key in this.props.edgeData) {
-        thisEdge = this.props.edgeData[key]
-      }
-      else {
-        thisEdge = {
-          owner: 0,
-          click: 0
-        }
-      }
+      let thisEdge = this.props.edgeData[key]
       this.edgeSVG.push(<Edge x={x} y={y} vertical={vertical} halfLength={halfLength} crossMarkSize={0.15}
         clickState={thisEdge.click} onClick={this.props.onClickWrapper(x,y)} color={colorMap[thisEdge.owner]} key={i}></Edge>)
     }
 
     return (
-      <div>
       <svg width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}
         onMouseUp={this.resetHover}>
         <g className="prevent-highlight"
@@ -118,7 +110,6 @@ class Grid extends Component {
           {this.edgeSVG}
         </g>
       </svg>
-      </div>
     );
   }
 };
