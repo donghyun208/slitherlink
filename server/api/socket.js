@@ -1,8 +1,11 @@
-
+const fs = require('fs')
+const path = require('path')
 
 const idGen = () => {
   return Math.random().toString(36).substr(2, 6)
 }
+
+let puzzles = loadPuzzles()
 
 let clients = [];
 let colorMap = {
@@ -10,6 +13,13 @@ let colorMap = {
   2: 'green',
   3: 'purple',
   4: 'teal'
+}
+
+function loadPuzzles() {
+  var filepath = path.join(__dirname + '/../config/puzzles.txt')
+  let data = fs.readFileSync(filepath, {encoding: 'utf-8'})
+  let puzzles = data.split('~')
+  return puzzles
 }
 
 module.exports = (socket, io, roomList) => {
@@ -117,19 +127,41 @@ module.exports = (socket, io, roomList) => {
 
 };
 
+
+function readTextFile(file) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                fileDisplayArea.innerText = allText
+            }
+        }
+    }
+    rawFile.send(null);
+}
+
 function generateNewRoom() {
   return {
     id: idGen(),
     numConnected: 0,
     players: {},
     edgeData: {},
-    problem: getRandomProblem()
+    puzzle: getRandomPuzzle()
   }
 }
 
-function getRandomProblem() {
-  let board = `.3.112.2..,.3..3.1312,22.1......,.3..3..2.2,2.....2.21,31.3.....3,2.2..3..2.,......1.32,2220.3..3.,..3.122.2.`
-  return board
+
+function getRandomPuzzle() {
+  let randIndex = Math.floor(Math.random() * puzzles.length);
+  console.log('prob: ',randIndex)
+  // let board = `.3.112.2..,.3..3.1312,22.1......,.3..3..2.2,2.....2.21,31.3.....3,2.2..3..2.,......1.32,2220.3..3.,..3.122.2.`
+  // return board
+  return puzzles[randIndex]
 }
 
 // function resetRoom(room) {

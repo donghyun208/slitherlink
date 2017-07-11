@@ -9,6 +9,14 @@ import update from 'immutability-helper';
   *
   * Use componentWillReceiveProps to enforce that props passed to Graph from Home
   * stay in sync with Graph's state
+  *
+  *
+  * edgeData is a hash table with
+  *    key:    String([index_x, index_y])
+  *    value:  { click: int,      // 0-unclicked, 1-clicked, 2-X'ed
+  *              owner: int       // 0-unowned, >0-corresponds to player index
+  *            }
+  *  right now, the last player to interact with an edge "owns" that edge, even if it is set to click=0
   */
 class Graph extends Component {
 
@@ -17,19 +25,51 @@ class Graph extends Component {
     // this.onClick = this.onClick.bind(this)
     // this.onMouseOver = this.onMouseOver.bind(this)
     this.onEdgeClick = this.onEdgeClick.bind(this)
+    let data = this.parsePuzzle(this.props.puzzle)
     this.state = {
       edgeData: {},
-      playerNum: this.props.playerNum
+      playerNum: this.props.playerNum,
+      problem: data.problem,
+      solution: data.solution
     }
   }
 
   componentWillReceiveProps(nextProps) {
-      console.log('updating player in Graph', this.props.playerNum , nextProps.playerNum)
+    console.log('updating player in Graph', this.props.playerNum , nextProps.playerNum)
     if (this.props.playerNum != nextProps.playerNum) {
       this.setState({
         playerNum: nextProps.playerNum
       })
     }
+    if (this.props.puzzle != nextProps.puzzle) {
+      let data = this.parsePuzzle(this.props.puzzle)
+      this.setState({
+        problem: data.problem,
+        solution: data.solution
+      })
+    }
+
+  }
+
+  parsePuzzle(puzzle){
+    console.log('received puzzle')
+    puzzle = puzzle.split(',')
+    // console.log(puzzle)
+    // let numRows = (puzzle.length - 1 ) / 2
+    // let numCols = (puzzle[0].length - 1 ) / 2
+    let problem = []
+    for (let i=0; i<puzzle.length; i++) {
+      if (i % 2 == 1){
+        let newStr = puzzle[i].replace(/\s/g,'')
+        newStr = newStr.replace(/\|/g, '')
+        problem.push(newStr)
+      }
+    }
+    return {
+      problem: problem,
+      solution: puzzle
+    }
+
   }
 
   componentDidMount() {
@@ -37,10 +77,11 @@ class Graph extends Component {
   }
 
   updateEdgeData(newEdgeData) {
-    let data = update(this.state.edgeData, {$merge: newEdgeData})
     // merge new data with old state before updateing otherwise it erases all the old keys
+    let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
+
     this.setState({
-      edgeData: data
+      edgeData: edgeData
     })
   }
 
@@ -104,7 +145,7 @@ class Graph extends Component {
   render() {
     return (
       <div className="col-8" style={{float: "none", margin: "0 auto"}}>
-        <Grid problem={this.props.problem} solution={''} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
+        <Grid problem={this.state.problem} solution={this.state.solution} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
         </Grid>
         <h3>{this.props.playerNum}</h3>
       </div>
