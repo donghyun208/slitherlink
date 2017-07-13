@@ -41,7 +41,8 @@ class Home extends Component {
         localStorage.setItem('slitherlink-roomID', data.id)
         this.setState({
           problem: data.problem,
-          edgeData: data.edgeData
+          edgeData: data.edgeData,
+          players: data.players
         })
         this.props.history.push('/' + this.roomID)
       })
@@ -60,7 +61,7 @@ class Home extends Component {
     return (
       <div>
         { this.state.problem &&
-          <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerNum={this.state.playerNum}/>
+          <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerNum={this.state.playerNum} players={this.state.players}/>
         }
       </div>
     );

@@ -44,7 +44,8 @@ class Graph extends Component {
       problem: this.props.problem,
       totSoln: totSoln,
       completed: false,
-      playerStats: initStats
+      playerStats: initStats,
+      players: this.props.players
     }
   }
 
@@ -56,16 +57,21 @@ class Graph extends Component {
       })
     }
     let totSoln = 0
-    for (let key in this.props.edgeData) {
-      totSoln += this.props.edgeData[key].soln
+    for (let key in nextProps.edgeData) {
+      totSoln += nextProps.edgeData[key].soln
     }
     if (this.props.problem != nextProps.problem) {
       this.setState({
-        problem: this.props.problem,
-        edgeData: this.props.edgeData,
+        problem: nextProps.problem,
+        edgeData: nextProps.edgeData,
         totSoln: totSoln
       })
     }
+
+    // if (this.props.players != nextProps.players) {
+    //   console.log('new player joined')
+    //   updateEdgeData(nextProps.edgeData)
+    // }
 
 
   }
@@ -85,6 +91,9 @@ class Graph extends Component {
     })
     let currSoln = 0
     let playerStats = {}
+    Object.keys(this.state.players).forEach((key) => {
+      playerStats[this.state.players[key]] = {numClick: 0}
+    })
     for (let key in edgeData) {
       let owner = edgeData[key].owner
       if (owner > 0) {
@@ -131,6 +140,9 @@ class Graph extends Component {
     this.socket.on('updateBoard', (data) => {
       console.log('updating board ', data)
       console.log('edge data', data.edgeData)
+      this.setState({
+        players: data.players
+      })
       this.updateEdgeData(data.edgeData)
     })
   }

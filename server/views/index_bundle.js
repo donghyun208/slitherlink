@@ -9148,7 +9148,8 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       problem: this.props.problem,
       totSoln: totSoln,
       completed: false,
-      playerStats: initStats
+      playerStats: initStats,
+      players: this.props.players
     };
   }
 
@@ -9160,16 +9161,22 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       });
     }
     let totSoln = 0;
-    for (let key in this.props.edgeData) {
-      totSoln += this.props.edgeData[key].soln;
+    for (let key in nextProps.edgeData) {
+      totSoln += nextProps.edgeData[key].soln;
     }
     if (this.props.problem != nextProps.problem) {
       this.setState({
-        problem: this.props.problem,
-        edgeData: this.props.edgeData,
+        problem: nextProps.problem,
+        edgeData: nextProps.edgeData,
         totSoln: totSoln
       });
     }
+
+    // if (this.props.players != nextProps.players) {
+    //   console.log('new player joined')
+    //   updateEdgeData(nextProps.edgeData)
+    // }
+
   }
 
   componentDidMount() {
@@ -9187,6 +9194,9 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     });
     let currSoln = 0;
     let playerStats = {};
+    Object.keys(this.state.players).forEach(key => {
+      playerStats[this.state.players[key]] = { numClick: 0 };
+    });
     for (let key in edgeData) {
       let owner = edgeData[key].owner;
       if (owner > 0) {
@@ -9230,6 +9240,9 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     this.socket.on('updateBoard', data => {
       console.log('updating board ', data);
       console.log('edge data', data.edgeData);
+      this.setState({
+        players: data.players
+      });
       this.updateEdgeData(data.edgeData);
     });
   }
@@ -15473,7 +15486,8 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         localStorage.setItem('slitherlink-roomID', data.id);
         this.setState({
           problem: data.problem,
-          edgeData: data.edgeData
+          edgeData: data.edgeData,
+          players: data.players
         });
         this.props.history.push('/' + this.roomID);
       });
@@ -15491,7 +15505,7 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       'div',
       null,
-      this.state.problem && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Graph__["a" /* default */], { problem: this.state.problem, edgeData: this.state.edgeData, playerNum: this.state.playerNum })
+      this.state.problem && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__components_Graph__["a" /* default */], { problem: this.state.problem, edgeData: this.state.edgeData, playerNum: this.state.playerNum, players: this.state.players })
     );
   }
 };
