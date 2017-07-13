@@ -22,7 +22,7 @@ class Grid extends Component {
     let numX = this.problem[0].length
     this.xOffset = 1
     this.yOffset = 1
-    this.scaleFactor = 24
+    this.scaleFactor = 18
 
     // multiply by 2 because every face is 2 units by 2 units
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
@@ -82,7 +82,7 @@ class Grid extends Component {
     for (let [i, [x,y]] of this.centerList.entries()) {
       let symbol = problem[(y-1)/2][(x-1)/2]
       if (symbol != '.') {
-        this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1" textAnchor="middle" alignmentBaseline="middle"
+        this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1.0" textAnchor="middle" alignmentBaseline="middle" fontWeight="500"
           key={i}>{symbol}</text>)
       }
     }

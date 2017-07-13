@@ -202,7 +202,7 @@ class Graph extends Component {
   render() {
     return (
       <div className="row">
-        <div className="offset-1 col-7">
+        <div className="col-sm-9">
           <div className="text-center">
             <Grid problem={this.state.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
             </Grid>
@@ -211,7 +211,7 @@ class Graph extends Component {
             </div>
           </div>
         </div>
-        <div className="col-3">
+        <div className="col-sm-3">
           <div className="text-center">
             <PlayerStats playerStats={this.state.playerStats}></PlayerStats>
           </div>

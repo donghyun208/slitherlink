@@ -9300,7 +9300,7 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       { className: 'row' },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
-        { className: 'offset-1 col-7' },
+        { className: 'col-sm-9' },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           { className: 'text-center' },
@@ -9318,7 +9318,7 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
-        { className: 'col-3' },
+        { className: 'col-sm-3' },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           { className: 'text-center' },
@@ -15283,7 +15283,7 @@ class Edge extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       'g',
       null,
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('line', { x1: this.x1, y1: this.y1, x2: this.x2, y2: this.y2,
-        strokeWidth: '0.12', stroke: this.props.color, visibility: this.props.clickState == 1 ? 'visible' : 'hidden' }),
+        strokeWidth: '0.14', stroke: this.props.color, visibility: this.props.clickState == 1 ? 'visible' : 'hidden' }),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'g',
         { visibility: this.props.clickState == 2 ? 'visible' : 'hidden', stroke: this.props.color },
@@ -15296,7 +15296,7 @@ class Edge extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('line', { x1: this.x1, y1: this.y1, x2: this.x2, y2: this.y2,
         onMouseOver: this.hoverOver, onClick: this.props.onClick, onContextMenu: this.props.onClick,
-        strokeWidth: '0.8', stroke: 'transparent' })
+        strokeWidth: '1.0', stroke: 'transparent' })
     );
   }
 };
@@ -15334,7 +15334,7 @@ const colorMap = {
     let numX = this.problem[0].length;
     this.xOffset = 1;
     this.yOffset = 1;
-    this.scaleFactor = 24;
+    this.scaleFactor = 18;
 
     // multiply by 2 because every face is 2 units by 2 units
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor;
@@ -15391,7 +15391,7 @@ const colorMap = {
       if (symbol != '.') {
         this.faceSVG.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'text',
-          { x: x, y: y, fill: 'black', fontSize: '1', textAnchor: 'middle', alignmentBaseline: 'middle',
+          { x: x, y: y, fill: 'black', fontSize: '1.0', textAnchor: 'middle', alignmentBaseline: 'middle', fontWeight: '500',
             key: i },
           symbol
         ));

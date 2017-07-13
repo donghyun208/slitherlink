@@ -21,7 +21,7 @@ class Edge extends Component {
     return (
       <g>
         <line x1={this.x1} y1={this.y1} x2={this.x2} y2={this.y2}
-          strokeWidth="0.12" stroke={this.props.color} visibility={this.props.clickState == 1 ? 'visible' : 'hidden'}></line>
+          strokeWidth="0.14" stroke={this.props.color} visibility={this.props.clickState == 1 ? 'visible' : 'hidden'}></line>
         <g visibility={this.props.clickState == 2 ? 'visible' : 'hidden'} stroke={this.props.color}>
           <line x1={this.props.x + this.props.crossMarkSize} y1={this.props.y + this.props.crossMarkSize}
             x2={this.props.x - this.props.crossMarkSize} y2={this.props.y - this.props.crossMarkSize}
@@ -32,7 +32,7 @@ class Edge extends Component {
         </g>
         <line x1={this.x1} y1={this.y1} x2={this.x2} y2={this.y2}
           onMouseOver={this.hoverOver} onClick={this.props.onClick} onContextMenu={this.props.onClick}
-          strokeWidth="0.8" stroke="transparent"></line>
+          strokeWidth="1.0" stroke="transparent"></line>
       </g>
     );
   }
