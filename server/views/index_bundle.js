@@ -9210,7 +9210,7 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         }
       }
     }
-    // console.log(currSoln, this.state.totSoln)
+    console.log(currSoln, this.state.totSoln);
     if (currSoln == this.state.totSoln) {
       this.setState({
         completed: true
@@ -9292,10 +9292,14 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
           'div',
           { className: 'text-center' },
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.state.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick }),
-          this.state.completed && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'h3',
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            'div',
             null,
-            'Complete'
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              'h3',
+              { style: { visibility: this.state.completed ? 'visible' : 'hidden' } },
+              'Complete'
+            )
           )
         )
       ),
@@ -15448,9 +15452,25 @@ class Home extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
     this.socket = this.context.socket;
     console.log("try to connect socket");
     this.socket.on("connect", () => {
-      this.socket.emit('roomID', this.props.match.params.roomID, data => {
+      console.log('the original room', this.props.match.params.roomID);
+      let roomID = this.props.match.params.roomID;
+      if (roomID == undefined) {
+        roomID = localStorage.getItem('slitherlink-roomID');
+      }
+      let sessionID = localStorage.getItem('slitherlink-sessionID');
+      if (sessionID == undefined) {
+        console.log('session id is empty');
+        sessionID = Math.random();
+        localStorage.setItem('slitherlink-sessionID', sessionID);
+      }
+      let postData = {
+        roomID: roomID,
+        sessionID: sessionID
+      };
+      this.socket.emit('roomID', postData, data => {
         console.log("Connected!", data);
         this.roomID = data.id;
+        localStorage.setItem('slitherlink-roomID', data.id);
         this.setState({
           problem: data.problem,
           edgeData: data.edgeData

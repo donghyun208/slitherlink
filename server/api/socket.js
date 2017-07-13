@@ -27,22 +27,25 @@ module.exports = (socket, io, roomList) => {
   // on connection, first join a random room.
   clients[socket.id] = socket;
   console.log('connected')
-  let debug = true
+  let debug = true;
 
   let currRoom = null;
+  let sessionID = null;
 
   socket.on('disconnect', () => {
     if (currRoom !== null) {
       currRoom.numConnected -= 1;
-      delete currRoom.players[socket.id]
+      // delete currRoom.players[socket.id]
       io.sockets.in(currRoom.id).emit('updating', currRoom);
     }
     console.log('deleting')
     delete clients[socket.id];
   });
 
-  socket.on('roomID', (roomID, cb) => {
-    console.log('trying to join room: ' + roomID)
+  socket.on('roomID', (data, cb) => {
+    let roomID = data.roomID
+    sessionID = data.sessionID
+    console.log('trying to join room: ' + roomID, sessionID)
     if (roomID !== '') {
       // try to join room
       if (roomID in roomList) {
@@ -57,18 +60,27 @@ module.exports = (socket, io, roomList) => {
       roomID = room.id
       socket.join(roomID)
       roomList[roomID] = room
-      room['players'].push
     }
     currRoom = roomList[roomID];
     currRoom.numConnected += 1;
-    let playerNum = currRoom.numConnected // TODO: modify this to assign each user some persistent ID
-    currRoom.players[socket.id] = playerNum
+    let playerNum;
+    if (sessionID in currRoom.players) {
+      playerNum = currRoom.players[sessionID]
+      console.log('wooo1' , playerNum, sessionID)
+    }
+    else {
+      playerNum = Object.keys(currRoom.players).length + 1
+      currRoom.players[sessionID] = playerNum
+      console.log('wooo2' , playerNum, sessionID)
+    }
 
     let playerData = {
       num: playerNum
     }
+      console.log('wooo3' , playerNum, sessionID)
     socket.emit('playerInfo', playerData)
     if (debug) {
+      console.log('wooo4' , playerNum, sessionID)
       console.log('emit playerInfo', playerData)
       console.log(currRoom)
       // console.log(roomList)
@@ -152,7 +164,6 @@ function generateNewRoom() {
   }
 }
 
-
 function getRandomPuzzle() {
   let randIndex = Math.floor(Math.random() * puzzles.length);
   console.log('prob: ',randIndex)
@@ -160,25 +171,3 @@ function getRandomPuzzle() {
   // return board
   return puzzles[randIndex]
 }
-
-// function resetRoom(room) {
-//   room.timeStart = null
-//   room.time = room.totTime
-//   room.started = false
-//   room.paused = false
-// }
-
-// function updateTimer(room) {
-//   // this fcn can create race conditions if multiple clients reconnect or pause/resume at the same time
-//     if (!room.paused ) {
-//       if (room.timeStart !== null) {
-//         let elapsedTime = Date.now() - room.timeStart
-//         room.timeStart = Date.now()
-//         console.log('elapsed' + elapsedTime)
-//         room.time -= elapsedTime
-//       }
-//     }
-//     else {
-//       room.timeStart = Date.now()
-//     }
-// }

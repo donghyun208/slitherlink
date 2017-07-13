@@ -108,7 +108,7 @@ class Graph extends Component {
         }
       }
     }
-    // console.log(currSoln, this.state.totSoln)
+    console.log(currSoln, this.state.totSoln)
     if (currSoln == this.state.totSoln) {
       this.setState({
         completed: true
@@ -194,9 +194,9 @@ class Graph extends Component {
           <div className="text-center">
             <Grid problem={this.state.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
             </Grid>
-            { this.state.completed &&
-              <h3>Complete</h3>
-            }
+            <div>
+              <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>
+            </div>
           </div>
         </div>
         <div className="col-3">
