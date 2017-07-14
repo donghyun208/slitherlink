@@ -32,7 +32,7 @@ class Graph extends Component {
     for (let key in this.props.edgeData) {
       totSoln += this.props.edgeData[key].soln
     }
-    console.log(this.props.problem)
+    // console.log(this.props.problem)
 
     let initStats = {}
     initStats[this.props.playerNum] = {
@@ -50,54 +50,65 @@ class Graph extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('updating player in Graph', this.props.playerNum , nextProps.playerNum)
     if (this.props.playerNum != nextProps.playerNum) {
+      console.log('updating player in Graph', this.props.playerNum , nextProps.playerNum)
       this.setState({
         playerNum: nextProps.playerNum
       })
     }
-    let totSoln = 0
-    for (let key in nextProps.edgeData) {
-      totSoln += nextProps.edgeData[key].soln
-    }
     if (this.props.problem != nextProps.problem) {
+      console.log('updating problem in Graph', nextProps.problem)
+      let totSoln = 0
+      for (let key in nextProps.edgeData) {
+        totSoln += nextProps.edgeData[key].soln
+      }
       this.setState({
         problem: nextProps.problem,
         edgeData: nextProps.edgeData,
         totSoln: totSoln
       })
     }
-
-    // if (this.props.players != nextProps.players) {
-    //   console.log('new player joined')
-    //   updateEdgeData(nextProps.edgeData)
-    // }
-
-
   }
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   // console.log('should IT????')
+  //   // console.log(this.props, nextProps)
+  //   console.log(this.state, nextState)
+  //   return true
+  // }
 
   componentDidMount() {
-    this.initSockets()
+    this.socket = this.context.socket
   }
 
+  // initSockets() {
+  //   this.socket = this.context.socket
+  //   this.socket.on('updateBoard', (data) => {
+  //    console.log('Socket:updateBoard - setting state in Graph via updateBoard')
+  //     this.setState({
+  //       players: data.players
+  //     })
+  //     console.log('updating edges via updateBoard', data)
+  //     this.updateEdgeData(data.edgeData)
+  //   })
+  // }
+
   updateEdgeData(newEdgeData) {
-    console.log('updating edgeData', newEdgeData)
+    console.log('starting updateEdgeData')
     // merge new data with old state before updateing otherwise it erases all the old keys
 
     // check if puzzle is correct
     let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
-    this.setState({
-      edgeData: edgeData
-    })
+    console.log(newEdgeData, this.state.edgeData["1,0"], edgeData["1,0"])
     let currSoln = 0
     let playerStats = {}
     Object.keys(this.state.players).forEach((key) => {
       playerStats[this.state.players[key]] = {numClick: 0}
     })
+    console.log('starting updateEdgeData *')
     for (let key in edgeData) {
       let owner = edgeData[key].owner
       if (owner > 0) {
-        // console.log('owner', owner, edgeData[key].click, owner in playerStats)
         if (!(owner in playerStats)) {
           playerStats[owner] = {
             numClick: 0
@@ -105,7 +116,6 @@ class Graph extends Component {
         }
         if (edgeData[key].click == 1) {
           playerStats[owner].numClick += 1
-          // console.log('up click')
         }
       }
       if (currSoln != -1 ) {
@@ -117,35 +127,15 @@ class Graph extends Component {
         }
       }
     }
-    console.log(currSoln, this.state.totSoln)
-    if (currSoln == this.state.totSoln) {
-      this.setState({
-        completed: true
-      })
-    }
-    else {
-      this.setState({
-        completed: false
-      })
-    }
+    console.log('starting updateEdgeData **')
+    console.log('setting state in Graph via updateEdgeData', edgeData)
     this.setState({
+      completed: currSoln == this.state.totSoln,
+      edgeData: edgeData,
       playerStats: playerStats
     })
-
-
   }
 
-  initSockets() {
-    this.socket = this.context.socket
-    this.socket.on('updateBoard', (data) => {
-      console.log('updating board ', data)
-      console.log('edge data', data.edgeData)
-      this.setState({
-        players: data.players
-      })
-      this.updateEdgeData(data.edgeData)
-    })
-  }
 
   onEdgeClick(x,y) {
     let key = String([x,y])
@@ -158,7 +148,7 @@ class Graph extends Component {
       else {
         clickState = 0
       }
-      console.log('clicked', key, clickState)
+      console.log('\n\nclicked', key, clickState)
       let newClickState = null
 
       let clickType = e.nativeEvent.which
@@ -182,13 +172,14 @@ class Graph extends Component {
         return
       }
 
-      let updatedSegment = {'edgeData': {}}
-      updatedSegment.edgeData[key] = {click: newClickState,
-                                      owner: this.state.playerNum,
-                                      soln:  solnState}
-      this.updateEdgeData(updatedSegment)
+      let updatedEdgeData = {}
+      updatedEdgeData[key] = {click: newClickState,
+                             owner: this.state.playerNum,
+                             soln:  solnState}
 
-      console.log('checking playernum', this.state.playerNum)
+      console.log('updating edges via edgeClick', updatedEdgeData)
+      this.updateEdgeData(updatedEdgeData)
+
       this.socket.emit('updateEdge', {
         key: key,
         click: newClickState,
@@ -200,10 +191,11 @@ class Graph extends Component {
 
       // <div className="col-8" style={{float: "none", margin: "0 auto"}}>
   render() {
+    console.log('********** Graph render **********')
     return (
       <div className="row">
         <div className="col-sm-9">
-          <div className="text-center">
+          <div className="">
             <Grid problem={this.state.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
             </Grid>
             <div>
@@ -212,7 +204,7 @@ class Graph extends Component {
           </div>
         </div>
         <div className="col-sm-3">
-          <div className="text-center">
+          <div className="">
             <PlayerStats playerStats={this.state.playerStats}></PlayerStats>
           </div>
         </div>

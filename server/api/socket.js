@@ -5,7 +5,7 @@ const idGen = () => {
   return Math.random().toString(36).substr(2, 6)
 }
 
-let puzzles = loadPuzzles()
+let puzzleDict = loadPuzzles()
 
 let clients = [];
 let colorMap = {
@@ -16,11 +16,15 @@ let colorMap = {
 }
 
 function loadPuzzles() {
-  var filepath = path.join(__dirname + '/../config/puzzles.txt')
-  // var filepath = path.join(__dirname + '/../config/puzzles_debug.txt')
-  let data = fs.readFileSync(filepath, {encoding: 'utf-8'})
-  let puzzles = data.split('~')
-  return puzzles
+  let puzzleDict = {}
+
+  let puzzleTypes = ['18_22_easy', '12_12_hard']
+  for (let puzzleKey of puzzleTypes) {
+    var filepath = path.join(__dirname + '/../config/' + puzzleKey + '_soln.txt')
+    let data = fs.readFileSync(filepath, {encoding: 'utf-8'})
+    puzzleDict[puzzleKey] = data.split('~')
+  }
+  return puzzleDict
 }
 
 module.exports = (socket, io, roomList) => {
@@ -66,23 +70,21 @@ module.exports = (socket, io, roomList) => {
     let playerNum;
     if (sessionID in currRoom.players) {
       playerNum = currRoom.players[sessionID]
-      console.log('wooo1' , playerNum, sessionID)
     }
     else {
       playerNum = Object.keys(currRoom.players).length + 1
       currRoom.players[sessionID] = playerNum
-      console.log('wooo2' , playerNum, sessionID)
     }
 
     let playerData = {
       num: playerNum
     }
-      console.log('wooo3' , playerNum, sessionID)
     socket.emit('playerInfo', playerData)
     if (debug) {
-      console.log('wooo4' , playerNum, sessionID)
-      console.log('emit playerInfo', playerData)
-      console.log(currRoom)
+
+      // console.log('wooo4' , playerNum, sessionID)
+      // console.log('emit playerInfo', playerData)
+      console.log('done parsing room')
       // console.log(roomList)
       // console.log(roomID in roomList)
     }
@@ -153,7 +155,9 @@ function parsePuzzle(puzzle) {
 }
 
 function generateNewRoom() {
-  let puzzle = getRandomPuzzle()
+  let puzzleType = '18_22_easy'
+  // let puzzleType = '12_12_hard'
+  let puzzle = getRandomPuzzle(puzzleType)
   let data = parsePuzzle(puzzle)
   return {
     id: idGen(),
@@ -164,7 +168,8 @@ function generateNewRoom() {
   }
 }
 
-function getRandomPuzzle() {
+function getRandomPuzzle(puzzleType) {
+  let puzzles = puzzleDict[puzzleType]
   let randIndex = Math.floor(Math.random() * puzzles.length);
   console.log('prob: ',randIndex)
   // let board = `.3.112.2..,.3..3.1312,22.1......,.3..3..2.2,2.....2.21,31.3.....3,2.2..3..2.,......1.32,2220.3..3.,..3.122.2.`

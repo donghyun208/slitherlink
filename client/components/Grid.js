@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import Edge from './Edge';
+import EdgeList from './EdgeList';
 
 const colorMap = {
   0: 'black',
@@ -15,25 +15,28 @@ const colorMap = {
 class Grid extends Component {
   constructor(props) {
     super(props);
-
-    this.problem = props.problem.split(',')
-    console.log(this.problem)
-    let numY = this.problem.length
-    let numX = this.problem[0].length
-    this.xOffset = 1
-    this.yOffset = 1
-    this.scaleFactor = 18
-
-    // multiply by 2 because every face is 2 units by 2 units
-    this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
-    this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor
-    this.constructGrid(numX, numY, this.problem)
-  }
-  componentWillReceiveProps(nextProps) {
-    // may need to update this if problem changes
+    this.constructGrid(this.props.problem)
   }
 
-  constructGrid(numX, numY, problem) {
+  shouldComponentUpdate(nextProps, nextState) {
+    return true
+  }
+  // componentWillReceiveProps(nextProps) {
+  //   // may need to update this if problem changes
+  //   //if edgeData change, check:
+  //   if (nextProps.problem != this.props.problem) {
+  //     constructGrid(nextProps.problem)
+  //   }
+  //   // else {
+  //   //   let prevEdgeData = this.props.edgeData
+  //   //   let nextEdgeData = nextprops.edgeData
+  //   //   for (let key in nextEdgeData) {
+  //   //     if (prevEdgeData[key].click != nextEdgeData[key].click)
+  //   //   }
+  //   // }
+  // }
+
+  constructGrid(problemStr) {
     /*
     This method only runs once! (called from the constructor)
 
@@ -45,6 +48,20 @@ class Grid extends Component {
     every point where only one of (x,y) is even will be an edge
     every point where both (x,y) are odd will be a face
     */
+
+    let problem = problemStr.split(',')
+    let numY = problem.length
+    let numX = problem[0].length
+    this.xOffset = 1
+    this.yOffset = 1
+    this.scaleFactor = 16
+
+    // multiply by 2 because every face is 2 units by 2 units
+    this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
+    this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor
+
+
+
     let xList = []
     let yList = []
 
@@ -90,26 +107,18 @@ class Grid extends Component {
   }
 
   render() {
-    this.edgeSVG = []
-    let halfLength = 0.8
-    for (let [i, [x,y]] of this.edgeList.entries()) {
-      let vertical = x % 2 ? false : true
-      let key = String([x,y])
-      let thisEdge = this.props.edgeData[key]
-      this.edgeSVG.push(<Edge x={x} y={y} vertical={vertical} halfLength={halfLength} crossMarkSize={0.15}
-        clickState={thisEdge.click} onClick={this.props.onClickWrapper(x,y)} color={colorMap[thisEdge.owner]} key={i}></Edge>)
-    }
-
     return (
-      <svg width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}
+      <span className="border-top-0">
+      <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}
         onMouseUp={this.resetHover}>
         <g className="prevent-highlight"
         transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
           {this.vertexSVG}
           {this.faceSVG}
-          {this.edgeSVG}
+          <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper}/>
         </g>
       </svg>
+      </span>
     );
   }
 };

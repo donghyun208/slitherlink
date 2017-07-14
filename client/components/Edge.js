@@ -17,6 +17,18 @@ class Edge extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    let returnState = false
+
+    Object.keys(nextProps).forEach((key) => {
+      if (this.props[key] != nextProps[key]){
+        returnState = true
+        return
+      }
+    })
+    return returnState
+  }
+
   render() {
     return (
       <g>
