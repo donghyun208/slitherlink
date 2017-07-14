@@ -32,7 +32,6 @@ class Graph extends Component {
     for (let key in this.props.edgeData) {
       totSoln += this.props.edgeData[key].soln
     }
-    // console.log(this.props.problem)
 
     let initStats = {}
     initStats[this.props.playerNum] = {
@@ -41,7 +40,6 @@ class Graph extends Component {
     this.state = {
       playerNum: this.props.playerNum,
       edgeData: this.props.edgeData,
-      problem: this.props.problem,
       totSoln: totSoln,
       completed: false,
       playerStats: initStats,
@@ -56,6 +54,11 @@ class Graph extends Component {
         playerNum: nextProps.playerNum
       })
     }
+
+    if (this.props.edgeData != nextProps.edgeData) {
+      this.updateEdgeData(nextProps.edgeData)
+    }
+
     if (this.props.problem != nextProps.problem) {
       console.log('updating problem in Graph', nextProps.problem)
       let totSoln = 0
@@ -63,35 +66,15 @@ class Graph extends Component {
         totSoln += nextProps.edgeData[key].soln
       }
       this.setState({
-        problem: nextProps.problem,
         edgeData: nextProps.edgeData,
         totSoln: totSoln
       })
     }
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   // console.log('should IT????')
-  //   // console.log(this.props, nextProps)
-  //   console.log(this.state, nextState)
-  //   return true
-  // }
-
   componentDidMount() {
     this.socket = this.context.socket
   }
-
-  // initSockets() {
-  //   this.socket = this.context.socket
-  //   this.socket.on('updateBoard', (data) => {
-  //    console.log('Socket:updateBoard - setting state in Graph via updateBoard')
-  //     this.setState({
-  //       players: data.players
-  //     })
-  //     console.log('updating edges via updateBoard', data)
-  //     this.updateEdgeData(data.edgeData)
-  //   })
-  // }
 
   updateEdgeData(newEdgeData) {
     console.log('starting updateEdgeData')
@@ -192,11 +175,13 @@ class Graph extends Component {
       // <div className="col-8" style={{float: "none", margin: "0 auto"}}>
   render() {
     console.log('********** Graph render **********')
+
+    console.log('01 Graph', this.props.edgeData["0,1"])
     return (
       <div className="row">
         <div className="col-sm-9">
           <div className="">
-            <Grid problem={this.state.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
+            <Grid problem={this.props.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
             </Grid>
             <div>
               <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>

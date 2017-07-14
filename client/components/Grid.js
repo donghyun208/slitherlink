@@ -21,20 +21,12 @@ class Grid extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return true
   }
-  // componentWillReceiveProps(nextProps) {
-  //   // may need to update this if problem changes
-  //   //if edgeData change, check:
-  //   if (nextProps.problem != this.props.problem) {
-  //     constructGrid(nextProps.problem)
-  //   }
-  //   // else {
-  //   //   let prevEdgeData = this.props.edgeData
-  //   //   let nextEdgeData = nextprops.edgeData
-  //   //   for (let key in nextEdgeData) {
-  //   //     if (prevEdgeData[key].click != nextEdgeData[key].click)
-  //   //   }
-  //   // }
-  // }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.problem != this.props.problem) {
+      this.constructGrid(nextProps.problem)
+    }
+  }
 
   constructGrid(problemStr) {
     /*
@@ -107,6 +99,7 @@ class Grid extends Component {
   }
 
   render() {
+    console.log('01 Grid', this.props.edgeData["0,1"])
     return (
       <span className="border-top-0">
       <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}

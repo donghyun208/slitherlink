@@ -6,7 +6,6 @@ class PuzzleSelector extends Component {
   constructor(props) {
     super(props);
     this.toggle = this.toggle.bind(this);
-    this.selectWrapper = this.selectWrapper.bind(this);
     this.state = {
       dropdownOpen: false
     };
@@ -21,13 +20,6 @@ class PuzzleSelector extends Component {
     });
   }
 
-  selectWrapper(size) {
-    return () => {
-      console.log('wotf', size)
-    }
-  }
-
-
   render() {
     return (
       <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
@@ -39,9 +31,9 @@ class PuzzleSelector extends Component {
           {/*<DropdownItem disabled>Action</DropdownItem>
           <DropdownItem onClick={this.selectWrapper(8)}>8x8</DropdownItem>
           */}
-          <DropdownItem onClick={this.selectWrapper(12)}>12x12</DropdownItem>
+          <DropdownItem onClick={this.props.onClickWrapper(12)}>12x12</DropdownItem>
           {/*<DropdownItem divider />*/}
-          <DropdownItem onClick={this.selectWrapper(18)}>18x22</DropdownItem>
+          <DropdownItem onClick={this.props.onClickWrapper(18)}>18x22</DropdownItem>
         </DropdownMenu>
       </Dropdown>
     );

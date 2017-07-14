@@ -19,6 +19,7 @@ class EdgeList extends Component {
   }
 
   render() {
+    console.log('01 edgeList', this.props.edgeData["0,1"])
     let edgeSVG = this.props.edgeList.map(([x,y], i) => {
       let vertical = (x % 2 == 0)
       let key = String([x,y])

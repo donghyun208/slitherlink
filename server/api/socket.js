@@ -76,19 +76,17 @@ module.exports = (socket, io, roomList) => {
       currRoom.players[sessionID] = playerNum
     }
 
-    let playerData = {
-      num: playerNum
-    }
-    socket.emit('playerInfo', playerData)
     if (debug) {
-
       // console.log('wooo4' , playerNum, sessionID)
       // console.log('emit playerInfo', playerData)
       console.log('done parsing room')
       // console.log(roomList)
       // console.log(roomID in roomList)
     }
-    cb(currRoom)
+    socket.emit('playerInfo', {
+      num: playerNum
+    })
+    socket.emit('updateRoom', currRoom)
     io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
   })
 
@@ -101,7 +99,41 @@ module.exports = (socket, io, roomList) => {
     }
     io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
   })
+
+  socket.on('newPuzzle', (size) => {
+    let puzzleType;
+    if (size == 12)
+      puzzleType = '12_12_hard'
+    else if (size == 18)
+      puzzleType = '18_22_easy'
+    let puzzle = getRandomPuzzle(puzzleType)
+    currRoom.edgeData = puzzle.edgeData
+    currRoom.problem = puzzle.problem
+    io.sockets.in(currRoom.id).emit('updateRoom', currRoom);
+  })
 };
+
+function generateNewRoom() {
+  let puzzleType = '12_12_hard'
+  let puzzle = getRandomPuzzle(puzzleType)
+  return {
+    id: idGen(),
+    numConnected: 0,
+    players: {},
+    edgeData: puzzle.edgeData,
+    problem: puzzle.problem
+  }
+}
+
+function getRandomPuzzle(puzzleType) {
+  let puzzles = puzzleDict[puzzleType]
+  let randIndex = Math.floor(Math.random() * puzzles.length);
+  console.log('prob: ',randIndex)
+  // let board = `.3.112.2..,.3..3.1312,22.1......,.3..3..2.2,2.....2.21,31.3.....3,2.2..3..2.,......1.32,2220.3..3.,..3.122.2.`
+  // return board
+  let randomPuzzle = puzzles[randIndex]
+  return parsePuzzle(randomPuzzle)
+}
 
 function parsePuzzle(puzzle) {
   puzzle = puzzle.split(',')
@@ -154,25 +186,3 @@ function parsePuzzle(puzzle) {
   }
 }
 
-function generateNewRoom() {
-  let puzzleType = '18_22_easy'
-  // let puzzleType = '12_12_hard'
-  let puzzle = getRandomPuzzle(puzzleType)
-  let data = parsePuzzle(puzzle)
-  return {
-    id: idGen(),
-    numConnected: 0,
-    players: {},
-    edgeData: data.edgeData,
-    problem: data.problem
-  }
-}
-
-function getRandomPuzzle(puzzleType) {
-  let puzzles = puzzleDict[puzzleType]
-  let randIndex = Math.floor(Math.random() * puzzles.length);
-  console.log('prob: ',randIndex)
-  // let board = `.3.112.2..,.3..3.1312,22.1......,.3..3..2.2,2.....2.21,31.3.....3,2.2..3..2.,......1.32,2220.3..3.,..3.122.2.`
-  // return board
-  return puzzles[randIndex]
-}

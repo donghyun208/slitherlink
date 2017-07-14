@@ -19,7 +19,9 @@ class Edge extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     let returnState = false
-
+    if (this.props.x ==0 && this.props.y==1) {
+      console.log('01 edge', this.props, nextProps)
+    }
     Object.keys(nextProps).forEach((key) => {
       if (this.props[key] != nextProps[key]){
         returnState = true

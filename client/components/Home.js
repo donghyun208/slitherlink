@@ -11,6 +11,7 @@ class Home extends Component {
       problem: null,
       playerNum: 0
     }
+    this.puzzleSelectWrapper = this.puzzleSelectWrapper.bind(this);
   }
 
   componentDidMount() {
@@ -36,7 +37,9 @@ class Home extends Component {
       roomID: roomID,
       sessionID: sessionID
     }
-    this.socket.emit('roomID', postData, (data) => {
+    this.socket.emit('roomID', postData)
+
+    this.socket.on('updateRoom', (data) => {
       console.log("Connected to room!", data);
       this.roomID = data.id
       localStorage.setItem('slitherlink-roomID', data.id)
@@ -56,12 +59,20 @@ class Home extends Component {
     })
 
     this.socket.on('updateBoard', (data) => {
-     console.log('Socket:updateBoard - setting state in Home via updateBoard')
+     console.log('Socket:updateBoard - setting state in Home via updateBoard', data.edgeData)
       this.setState({
         edgeData: data.edgeData,
         players: data.players
       })
     })
+  }
+
+
+  puzzleSelectWrapper(size) {
+    return () => {
+      console.log('change puzzle', size)
+      this.socket.emit('newPuzzle', size)
+    }
   }
 
   render() {
@@ -75,7 +86,7 @@ class Home extends Component {
           { this.state.problem &&
             <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerNum={this.state.playerNum} players={this.state.players}/>
           }
-        <PuzzleSelector/>
+        <PuzzleSelector onClickWrapper={this.puzzleSelectWrapper}/>
         </div>
       </div>
     );
