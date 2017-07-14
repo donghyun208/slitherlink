@@ -47,6 +47,10 @@ class Graph extends Component {
     }
   }
 
+  componentDidMount() {
+    this.socket = this.context.socket
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.playerNum != nextProps.playerNum) {
       console.log('updating player in Graph', this.props.playerNum , nextProps.playerNum)
@@ -66,29 +70,34 @@ class Graph extends Component {
         totSoln += nextProps.edgeData[key].soln
       }
       this.setState({
-        edgeData: nextProps.edgeData,
         totSoln: totSoln
       })
     }
   }
-
-  componentDidMount() {
-    this.socket = this.context.socket
+  shouldComponentUpdate(nextProps, nextState) {
+    let shouldUpdate = false
+    Object.keys(nextProps).forEach((key) => {
+      if (this.props[key] != nextProps[key]){
+        shouldUpdate = true
+      }
+    })
+    Object.keys(nextState).forEach((key) => {
+      if (this.state[key] != nextState[key]){
+        shouldUpdate = true
+      }
+    })
+    return shouldUpdate
   }
 
   updateEdgeData(newEdgeData) {
-    console.log('starting updateEdgeData')
     // merge new data with old state before updateing otherwise it erases all the old keys
-
     // check if puzzle is correct
     let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
-    console.log(newEdgeData, this.state.edgeData["1,0"], edgeData["1,0"])
     let currSoln = 0
     let playerStats = {}
     Object.keys(this.state.players).forEach((key) => {
       playerStats[this.state.players[key]] = {numClick: 0}
     })
-    console.log('starting updateEdgeData *')
     for (let key in edgeData) {
       let owner = edgeData[key].owner
       if (owner > 0) {
@@ -110,8 +119,7 @@ class Graph extends Component {
         }
       }
     }
-    console.log('starting updateEdgeData **')
-    console.log('setting state in Graph via updateEdgeData', edgeData)
+    console.log('Graph.updateEdgeData - setting state', edgeData)
     this.setState({
       completed: currSoln == this.state.totSoln,
       edgeData: edgeData,
@@ -123,33 +131,17 @@ class Graph extends Component {
   onEdgeClick(x,y) {
     let key = String([x,y])
     return (e) => {
-      let clickState
-      let solnState = this.state.edgeData[key].soln
-      if (key in this.state.edgeData) {
-        clickState = this.state.edgeData[key].click
-      }
-      else {
-        clickState = 0
-      }
       console.log('\n\nclicked', key, clickState)
+      let solnState = this.state.edgeData[key].soln
+      let clickState = this.state.edgeData[key].click
       let newClickState = null
 
       let clickType = e.nativeEvent.which
       if (clickType === 1) {
-        if (clickState === 1) {
-          newClickState = 0
-        }
-        else {
-          newClickState = 1
-        }
+        newClickState = (clickState === 1) ? 0 : 1
       }
       else if (clickType === 3) {
-        if (clickState === 2) {
-          newClickState = 0
-        }
-        else {
-          newClickState = 2
-        }
+        newClickState = (clickState === 2) ? 0 : 2
       }
       else {
         return
@@ -157,8 +149,8 @@ class Graph extends Component {
 
       let updatedEdgeData = {}
       updatedEdgeData[key] = {click: newClickState,
-                             owner: this.state.playerNum,
-                             soln:  solnState}
+                              owner: this.state.playerNum,
+                              soln:  solnState}
 
       console.log('updating edges via edgeClick', updatedEdgeData)
       this.updateEdgeData(updatedEdgeData)
@@ -172,11 +164,8 @@ class Graph extends Component {
     }
   }
 
-      // <div className="col-8" style={{float: "none", margin: "0 auto"}}>
   render() {
     console.log('********** Graph render **********')
-
-    console.log('01 Graph', this.props.edgeData["0,1"])
     return (
       <div className="row">
         <div className="col-sm-9">
@@ -201,6 +190,5 @@ class Graph extends Component {
 Graph.contextTypes = {
   socket: React.PropTypes.object
 };
-
 
 export default Graph

@@ -97,7 +97,8 @@ module.exports = (socket, io, roomList) => {
       owner: data.playerNum,
       soln: data.soln
     }
-    io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
+    socket.broadcast.to(currRoom.id).emit('updateBoard', currRoom);
+    // io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
   })
 
   socket.on('newPuzzle', (size) => {

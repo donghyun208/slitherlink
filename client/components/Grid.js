@@ -52,8 +52,6 @@ class Grid extends Component {
     this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
     this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor
 
-
-
     let xList = []
     let yList = []
 
@@ -95,11 +93,9 @@ class Grid extends Component {
           key={i}>{symbol}</text>)
       }
     }
-
   }
 
   render() {
-    console.log('01 Grid', this.props.edgeData["0,1"])
     return (
       <span className="border-top-0">
       <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}
@@ -108,7 +104,7 @@ class Grid extends Component {
         transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
           {this.vertexSVG}
           {this.faceSVG}
-          <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper}/>
+          <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper} problem={this.props.problem}/>
         </g>
       </svg>
       </span>

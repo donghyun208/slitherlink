@@ -12,14 +12,24 @@ const colorMap = {
 class EdgeList extends Component {
   constructor(props) {
     super(props);
+    this.assignClickFcns(this.props.edgeList)
+  }
 
-    this.edgeClickFcns = this.props.edgeList.map(([x,y], i) => {
+  componentWillReceiveProps(nextProps) {
+    // may need to update this if problem changes
+    if (this.props.problem != nextProps.problem) {
+      this.assignClickFcns(nextProps.edgeList)
+      this.forceUpdate()
+    }
+  }
+
+  assignClickFcns(edgeList){
+    this.edgeClickFcns = edgeList.map(([x,y], i) => {
       return this.props.onClickWrapper(x,y)
     })
   }
 
   render() {
-    console.log('01 edgeList', this.props.edgeData["0,1"])
     let edgeSVG = this.props.edgeList.map(([x,y], i) => {
       let vertical = (x % 2 == 0)
       let key = String([x,y])

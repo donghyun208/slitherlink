@@ -22,7 +22,7 @@ class Home extends Component {
   }
 
   initSockets() {
-    console.log('the original room', this.props.match.params.roomID)
+    console.log('the original room-url', this.props.match.params.roomID)
     let roomID = this.props.match.params.roomID
     if (roomID == undefined) {
       roomID = localStorage.getItem('slitherlink-roomID')
@@ -40,7 +40,7 @@ class Home extends Component {
     this.socket.emit('roomID', postData)
 
     this.socket.on('updateRoom', (data) => {
-      console.log("Connected to room!", data);
+      console.log("Socket:updateRoom - Connected to room!", data);
       this.roomID = data.id
       localStorage.setItem('slitherlink-roomID', data.id)
       this.setState({
@@ -52,7 +52,7 @@ class Home extends Component {
     })
 
     this.socket.on("playerInfo", (data) => {
-      console.log('got player info', data)
+      console.log('Socket:playerInfo', data)
       this.setState({
         playerNum: data.num
       })
@@ -70,7 +70,6 @@ class Home extends Component {
 
   puzzleSelectWrapper(size) {
     return () => {
-      console.log('change puzzle', size)
       this.socket.emit('newPuzzle', size)
     }
   }

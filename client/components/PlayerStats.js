@@ -16,7 +16,6 @@ class PlayerStats extends Component {
   }
   componentWillReceiveProps(nextProps) {
     // may need to update this if problem changes
-    console.log(nextProps)
   }
 
 
