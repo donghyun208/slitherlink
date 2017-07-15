@@ -9234,9 +9234,9 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
   onEdgeClick(x, y) {
     let key = String([x, y]);
     return e => {
-      console.log('\n\nclicked', key, clickState);
       let solnState = this.state.edgeData[key].soln;
       let clickState = this.state.edgeData[key].click;
+      console.log('\n\nclicked', key, clickState);
       let newClickState = null;
 
       let clickType = e.nativeEvent.which;
@@ -9276,7 +9276,7 @@ class Graph extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'div',
           { className: '' },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.props.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick }),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1__Grid__["a" /* default */], { problem: this.props.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick, completed: this.state.completed }),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             'div',
             null,
@@ -15381,7 +15381,8 @@ const colorMap = {
       if (symbol != '.') {
         this.faceSVG.push(__WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'text',
-          { x: x, y: y, fill: 'black', fontSize: '1.0', textAnchor: 'middle', alignmentBaseline: 'middle', fontWeight: '500',
+          { x: x, y: y, fill: 'black', fontSize: '1.0', textAnchor: 'middle', alignmentBaseline: 'middle', fontWeight: '500', style: { cursor: 'default' },
+
             key: i },
           symbol
         ));
@@ -15397,8 +15398,8 @@ const colorMap = {
         'svg',
         { width: this.svgWidth + "px", height: this.svgHeight + "px", onContextMenu: e => {
             e.preventDefault();
-          },
-          onMouseUp: this.resetHover },
+          } },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('rect', { x: 0, y: 0, height: this.svgHeight, width: this.svgWidth, stroke: this.props.completed ? 'green' : 'black', fill: 'none', strokeWidth: '4' }),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           'g',
           { className: 'prevent-highlight',
@@ -35360,6 +35361,11 @@ class PuzzleSelector extends __WEBPACK_IMPORTED_MODULE_0_react__["Component"] {
           __WEBPACK_IMPORTED_MODULE_1_reactstrap__["d" /* DropdownItem */],
           { onClick: this.props.onClickWrapper(12) },
           '12x12'
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_1_reactstrap__["d" /* DropdownItem */],
+          { onClick: this.props.onClickWrapper(16) },
+          '16x16'
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_1_reactstrap__["d" /* DropdownItem */],

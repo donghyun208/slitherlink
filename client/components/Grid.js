@@ -89,7 +89,8 @@ class Grid extends Component {
     for (let [i, [x,y]] of this.centerList.entries()) {
       let symbol = problem[(y-1)/2][(x-1)/2]
       if (symbol != '.') {
-        this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1.0" textAnchor="middle" alignmentBaseline="middle" fontWeight="500"
+        this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1.0" textAnchor="middle" alignmentBaseline="middle" fontWeight="500" style={{cursor:'default'}}
+
           key={i}>{symbol}</text>)
       }
     }
@@ -98,15 +99,15 @@ class Grid extends Component {
   render() {
     return (
       <span className="border-top-0">
-      <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}
-        onMouseUp={this.resetHover}>
-        <g className="prevent-highlight"
-        transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
-          {this.vertexSVG}
-          {this.faceSVG}
-          <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper} problem={this.props.problem}/>
-        </g>
-      </svg>
+        <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>
+          <rect x={0} y={0} height={this.svgHeight} width={this.svgWidth} stroke={this.props.completed ? 'green' : 'black'} fill='none' strokeWidth='4'/>
+          <g className="prevent-highlight"
+          transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
+            {this.vertexSVG}
+            {this.faceSVG}
+            <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper} problem={this.props.problem}/>
+          </g>
+        </svg>
       </span>
     );
   }

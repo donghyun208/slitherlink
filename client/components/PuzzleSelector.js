@@ -33,6 +33,7 @@ class PuzzleSelector extends Component {
           */}
           <DropdownItem onClick={this.props.onClickWrapper(12)}>12x12</DropdownItem>
           {/*<DropdownItem divider />*/}
+          <DropdownItem onClick={this.props.onClickWrapper(16)}>16x16</DropdownItem>
           <DropdownItem onClick={this.props.onClickWrapper(18)}>18x22</DropdownItem>
         </DropdownMenu>
       </Dropdown>

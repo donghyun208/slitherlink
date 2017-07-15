@@ -18,7 +18,7 @@ let colorMap = {
 function loadPuzzles() {
   let puzzleDict = {}
 
-  let puzzleTypes = ['18_22_easy', '12_12_hard']
+  let puzzleTypes = ['18_22_easy', '16_16_normal', '12_12_hard']
   for (let puzzleKey of puzzleTypes) {
     var filepath = path.join(__dirname + '/../config/' + puzzleKey + '_soln.txt')
     let data = fs.readFileSync(filepath, {encoding: 'utf-8'})
@@ -105,6 +105,8 @@ module.exports = (socket, io, roomList) => {
     let puzzleType;
     if (size == 12)
       puzzleType = '12_12_hard'
+    else if (size == 16)
+      puzzleType = '16_16_normal'
     else if (size == 18)
       puzzleType = '18_22_easy'
     let puzzle = getRandomPuzzle(puzzleType)

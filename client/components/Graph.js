@@ -131,9 +131,9 @@ class Graph extends Component {
   onEdgeClick(x,y) {
     let key = String([x,y])
     return (e) => {
-      console.log('\n\nclicked', key, clickState)
       let solnState = this.state.edgeData[key].soln
       let clickState = this.state.edgeData[key].click
+      console.log('\n\nclicked', key, clickState)
       let newClickState = null
 
       let clickType = e.nativeEvent.which
@@ -170,7 +170,7 @@ class Graph extends Component {
       <div className="row">
         <div className="col-sm-9">
           <div className="">
-            <Grid problem={this.props.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick}>
+            <Grid problem={this.props.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick} completed={this.state.completed}>
             </Grid>
             <div>
               <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>
