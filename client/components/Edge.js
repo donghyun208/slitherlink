@@ -3,18 +3,6 @@ import React, { PropTypes, Component } from 'react'
 class Edge extends Component {
   constructor(props) {
     super(props);
-    if (props.vertical) {
-      this.x1 = props.x
-      this.x2 = props.x
-      this.y1 = props.y - props.halfLength
-      this.y2 = props.y + props.halfLength
-    }
-    else {
-      this.x1 = props.x - props.halfLength
-      this.x2 = props.x + props.halfLength
-      this.y1 = props.y
-      this.y2 = props.y
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -29,6 +17,18 @@ class Edge extends Component {
   }
 
   render() {
+    if (this.props.vertical) {
+      this.x1 = this.props.x
+      this.x2 = this.props.x
+      this.y1 = this.props.y - this.props.halfLength
+      this.y2 = this.props.y + this.props.halfLength
+    }
+    else {
+      this.x1 = this.props.x - this.props.halfLength
+      this.x2 = this.props.x + this.props.halfLength
+      this.y1 = this.props.y
+      this.y2 = this.props.y
+    }
     return (
       <g>
         <line x1={this.x1} y1={this.y1} x2={this.x2} y2={this.y2}

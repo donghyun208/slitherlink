@@ -40,7 +40,7 @@ class Home extends Component {
     this.socket.emit('roomID', postData)
 
     this.socket.on('updateRoom', (data) => {
-      console.log("Socket:updateRoom - Connected to room!", data);
+      console.log("\n\n\nSocket:updateRoom - Connected to room!", data);
       this.roomID = data.id
       localStorage.setItem('slitherlink-roomID', data.id)
       this.setState({

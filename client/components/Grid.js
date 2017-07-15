@@ -100,7 +100,9 @@ class Grid extends Component {
     return (
       <span className="border-top-0">
         <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>
-          <rect x={0} y={0} height={this.svgHeight} width={this.svgWidth} stroke={this.props.completed ? 'green' : 'black'} fill='none' strokeWidth='4'/>
+          <g stroke={this.props.completed ? 'green' : 'black'}>
+            <rect x={0} y={0} height={this.svgHeight} width={this.svgWidth}  fill='none' strokeWidth='4'/>
+          </g>
           <g className="prevent-highlight"
           transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
             {this.vertexSVG}
