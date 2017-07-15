@@ -4,9 +4,7 @@ const path = require('path')
 const idGen = () => {
   return Math.random().toString(36).substr(2, 6)
 }
-
 let puzzleDict = loadPuzzles()
-
 let clients = [];
 let colorMap = {
   1: 'teal',

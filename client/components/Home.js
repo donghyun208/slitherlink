@@ -2,6 +2,8 @@ import React, { PropTypes, Component } from 'react'
 import {withRouter} from "react-router-dom";
 import Graph from './Graph';
 import PuzzleSelector from './PuzzleSelector';
+import { Button } from 'reactstrap';
+
 
 class Home extends Component {
 
@@ -12,13 +14,14 @@ class Home extends Component {
       playerNum: 0
     }
     this.puzzleSelectWrapper = this.puzzleSelectWrapper.bind(this);
+    this.goTutorial = this.goTutorial.bind(this);
+    console.log('home')
   }
 
   componentDidMount() {
+    console.log('connect')
     this.socket = this.context.socket
-    this.socket.on("connect", () => {
-      this.initSockets()
-    })
+    this.initSockets()
   }
 
   initSockets() {
@@ -74,6 +77,10 @@ class Home extends Component {
     }
   }
 
+  goTutorial() {
+    this.props.history.push('/tutorial')
+  }
+
   render() {
     return (
       <div className="pb-4 pt-2">
@@ -85,7 +92,14 @@ class Home extends Component {
           { this.state.problem &&
             <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerNum={this.state.playerNum} players={this.state.players}/>
           }
-        <PuzzleSelector onClickWrapper={this.puzzleSelectWrapper}/>
+          <div className="row">
+            <div className="col-sm-2">
+              <PuzzleSelector onClickWrapper={this.puzzleSelectWrapper}/>
+            </div>
+            <div className="col-sm-2">
+              <Button color="secondary" onClick={this.goTutorial}>How to Play</Button>
+            </div>
+          </div>
         </div>
       </div>
     );
