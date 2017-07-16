@@ -234,7 +234,7 @@ class Tutorial extends Component {
                 <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>
               </div>
             </div>
-            <div className="col-sm-5">
+            <div className="col">
               <ul>
                 {this.state.instructions}
               </ul>

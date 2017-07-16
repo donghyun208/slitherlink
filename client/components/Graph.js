@@ -90,6 +90,7 @@ class Graph extends Component {
   }
 
   updateEdgeData(newEdgeData) {
+    // refactor to not loop -  also dont need to merge, can modifuy directly then call setState again
     // merge new data with old state before updateing otherwise it erases all the old keys
     // check if puzzle is correct
     let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
@@ -133,10 +134,14 @@ class Graph extends Component {
     return (e) => {
       let solnState = this.state.edgeData[key].soln
       let clickState = this.state.edgeData[key].click
+      let owner = this.state.edgeData[key].owner
       console.log('\n\nclicked', key, clickState)
       let newClickState = null
 
       let clickType = e.nativeEvent.which
+      if (clickState === 1 && owner !== 0 && owner !== this.state.playerNum) {
+        return
+      }
       if (clickType === 1) {
         newClickState = (clickState === 1) ? 0 : 1
       }
