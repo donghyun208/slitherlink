@@ -11,7 +11,7 @@ class Home extends Component {
     super(props);
     this.state = {
       problem: null,
-      playerNum: 0
+      playerID: null
     }
     this.puzzleSelectWrapper = this.puzzleSelectWrapper.bind(this);
     this.goTutorial = this.goTutorial.bind(this);
@@ -30,15 +30,17 @@ class Home extends Component {
     if (roomID == undefined) {
       roomID = localStorage.getItem('slitherlink-roomID')
     }
-    let sessionID = localStorage.getItem('slitherlink-sessionID')
-    if (sessionID == undefined) {
+    let playerID = localStorage.getItem('slitherlink-playerID')
+    if (playerID == undefined) {
       console.log('session id is empty')
-      sessionID = Math.random()
-      localStorage.setItem('slitherlink-sessionID', sessionID)
+      playerID = Math.random()
+      localStorage.setItem('slitherlink-playerID', playerID)
     }
+
+    this.state.playerID = playerID
     let postData = {
       roomID: roomID,
-      sessionID: sessionID
+      playerID: playerID
     }
     this.socket.emit('roomID', postData)
 
@@ -54,15 +56,16 @@ class Home extends Component {
       this.props.history.push('/' + this.roomID)
     })
 
-    this.socket.on("playerInfo", (data) => {
-      console.log('Socket:playerInfo', data)
-      this.setState({
-        playerNum: data.num
-      })
-    })
+    // this.socket.on("playerInfo", (data) => {
+    //   console.log('Socket:playerInfo', data)
+    //   this.setState({
+    //     playerNum: data.num
+    //   })
+    // })
 
     this.socket.on('updateBoard', (data) => {
      console.log('Socket:updateBoard - setting state in Home via updateBoard', data.edgeData)
+      console.log(data)
       this.setState({
         edgeData: data.edgeData,
         players: data.players
@@ -90,7 +93,7 @@ class Home extends Component {
           <p className="lead" style={{display:"inline"}}>Share this URL to collaborate on this puzzle</p>
           <hr></hr>
           { this.state.problem &&
-            <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerNum={this.state.playerNum} players={this.state.players}/>
+            <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerID={this.state.playerID} players={this.state.players}/>
           }
           <div className="row">
             <div className="col-sm-2">

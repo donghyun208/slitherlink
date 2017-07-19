@@ -32,7 +32,7 @@ module.exports = (socket, io, roomList) => {
   let debug = true;
 
   let currRoom = null;
-  let sessionID = null;
+  let playerID = null;
 
   socket.on('disconnect', () => {
     if (currRoom !== null) {
@@ -46,8 +46,8 @@ module.exports = (socket, io, roomList) => {
 
   socket.on('roomID', (data, cb) => {
     let roomID = data.roomID
-    sessionID = data.sessionID
-    console.log('trying to join room: ' + roomID, sessionID)
+    playerID = data.playerID
+    console.log('trying to join room: ' + roomID, playerID)
     if (roomID !== '') {
       // try to join room
       if (roomID in roomList) {
@@ -66,34 +66,36 @@ module.exports = (socket, io, roomList) => {
     currRoom = roomList[roomID];
     currRoom.numConnected += 1;
     let playerNum;
-    if (sessionID in currRoom.players) {
-      playerNum = currRoom.players[sessionID]
+    if (playerID in currRoom.players) {
+      playerNum = currRoom.players[playerID].playerNum
     }
     else {
+      currRoom.players[playerID] = {}
       playerNum = Object.keys(currRoom.players).length + 1
-      currRoom.players[sessionID] = playerNum
+      currRoom.players[playerID]['playerNum'] = playerNum
     }
 
     if (debug) {
-      // console.log('wooo4' , playerNum, sessionID)
+      // console.log('wooo4' , playerNum, playerID)
       // console.log('emit playerInfo', playerData)
       console.log('done parsing room')
       // console.log(roomList)
       // console.log(roomID in roomList)
     }
-    socket.emit('playerInfo', {
-      num: playerNum
-    })
+    // socket.emit('playerInfo', {
+    //   num: playerNum
+    // })
     socket.emit('updateRoom', currRoom)
     io.sockets.in(currRoom.id).emit('updateBoard', currRoom);
   })
 
   socket.on('updateEdge', (data) => {
-    console.log('edge ', data.key, ' clicked by ', data.playerNum)
+    console.log('edge ', data.key, ' clicked by ', data.playerNum, data)
     currRoom.edgeData[data.key] = {
       click: data.click,
       owner: data.playerNum,
-      soln: data.soln
+      soln: data.soln,
+      numClick: data.numClick
     }
     socket.broadcast.to(currRoom.id).emit('updateBoard', currRoom);
     // io.sockets.in(currRoom.id).emit('updateBoard', currRoom);

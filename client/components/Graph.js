@@ -60,15 +60,16 @@ class Graph extends Component {
     }
 
     if (this.props.edgeData != nextProps.edgeData) {
-      this.updateEdgeData(nextProps.edgeData)
+      this.state.edgeData = nextProps.edgeData
+      this.updateEdgeData()
     }
 
     if (this.props.problem != nextProps.problem) {
-      console.log('updating problem in Graph', nextProps.problem)
       let totSoln = 0
       for (let key in nextProps.edgeData) {
         totSoln += nextProps.edgeData[key].soln
       }
+      console.log('updating problem in Graph', nextProps.problem, totSoln)
       this.setState({
         totSoln: totSoln
       })
@@ -93,7 +94,9 @@ class Graph extends Component {
     // refactor to not loop -  also dont need to merge, can modifuy directly then call setState again
     // merge new data with old state before updateing otherwise it erases all the old keys
     // check if puzzle is correct
-    let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
+    // let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
+    // let edgeData = newEdgeData
+    let edgeData = this.state.edgeData
     let currSoln = 0
     let playerStats = {}
     Object.keys(this.state.players).forEach((key) => {
@@ -102,11 +105,6 @@ class Graph extends Component {
     for (let key in edgeData) {
       let owner = edgeData[key].owner
       if (owner > 0) {
-        if (!(owner in playerStats)) {
-          playerStats[owner] = {
-            numClick: 0
-          }
-        }
         if (edgeData[key].click == 1) {
           playerStats[owner].numClick += 1
         }
@@ -124,7 +122,7 @@ class Graph extends Component {
     this.setState({
       completed: currSoln == this.state.totSoln,
       edgeData: edgeData,
-      playerStats: playerStats
+      players: players
     })
   }
 
@@ -137,34 +135,45 @@ class Graph extends Component {
       let owner = this.state.edgeData[key].owner
       console.log('\n\nclicked', key, clickState)
       let newClickState = null
+      let currPlayer = this.state.playerNum
+
 
       let clickType = e.nativeEvent.which
-      if (clickState === 1 && owner !== 0 && owner !== this.state.playerNum) {
+      if (clickState === 1 && owner !== 0 && owner !== currPlayer) {
         return
       }
       if (clickType === 1) {
         newClickState = (clickState === 1) ? 0 : 1
+        this.state.players[currPlayer].numClick += (clickState === 1) ? -1: 1
       }
       else if (clickType === 3) {
         newClickState = (clickState === 2) ? 0 : 2
+        this.state.players[currPlayer].numClick += (clickState === 1) ? -1: 0
       }
       else {
         return
       }
 
-      let updatedEdgeData = {}
-      updatedEdgeData[key] = {click: newClickState,
-                              owner: this.state.playerNum,
-                              soln:  solnState}
+      this.setState({
+        playerStats: this.state.playerStats
+      })
+      // let updatedEdgeData = {}
+      // updatedEdgeData[key] = {click: newClickState,
+      //                         owner: this.state.playerNum,
+      //                         soln:  solnState}
+      this.state.edgeData[key] = {click: newClickState,
+                                  owner: this.state.playerNum,
+                                  soln:  solnState}
 
-      console.log('updating edges via edgeClick', updatedEdgeData)
-      this.updateEdgeData(updatedEdgeData)
+      // console.log('updating edges via edgeClick', updatedEdgeData)
+      this.updateEdgeData()
 
       this.socket.emit('updateEdge', {
         key: key,
         click: newClickState,
         playerNum: this.state.playerNum,
-        soln: solnState
+        soln: solnState,
+        numClick: this.state.playerStats[currPlayer].numClick
       })
     }
   }
