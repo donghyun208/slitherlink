@@ -5,13 +5,23 @@ import PuzzleSelector from './PuzzleSelector';
 import { Button } from 'reactstrap';
 
 
+/**
+  * Keep all socket.on() definitions here. Any state changes that the server makes
+  * should be stored here and passed down to child components.
+  *
+  * socket.emit can be called from anywhere.
+  */
 class Home extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       problem: null,
-      playerID: null
+      edgeData: null,
+      playerID: null,
+      totSoln: 0,
+      numCorrect: 0,
+      numIncorrect: 0
     }
     this.puzzleSelectWrapper = this.puzzleSelectWrapper.bind(this);
     this.goTutorial = this.goTutorial.bind(this);
@@ -19,12 +29,12 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    console.log('connect')
     this.socket = this.context.socket
     this.initSockets()
   }
 
   initSockets() {
+/*********** get local storage data ***********/
     console.log('the original room-url', this.props.match.params.roomID)
     let roomID = this.props.match.params.roomID
     if (roomID == undefined) {
@@ -36,43 +46,40 @@ class Home extends Component {
       playerID = Math.random()
       localStorage.setItem('slitherlink-playerID', playerID)
     }
-
     this.state.playerID = playerID
-    let postData = {
+/**********************************************/
+
+    this.socket.emit('roomID', {
       roomID: roomID,
       playerID: playerID
-    }
-    this.socket.emit('roomID', postData)
+    })
 
+/*************** updateRoom *******************/
     this.socket.on('updateRoom', (data) => {
       console.log("\n\n\nSocket:updateRoom - Connected to room!", data);
-      this.roomID = data.id
       localStorage.setItem('slitherlink-roomID', data.id)
       this.setState({
         problem: data.problem,
+        totSoln: data.totSoln,
         edgeData: data.edgeData,
-        players: data.players
+        players: data.players,
+        numCorrect: data.numCorrect,
+        numIncorrect: data.numIncorrect
       })
-      this.props.history.push('/' + this.roomID)
+      this.props.history.push('/' + data.id)
     })
 
-    // this.socket.on("playerInfo", (data) => {
-    //   console.log('Socket:playerInfo', data)
-    //   this.setState({
-    //     playerNum: data.num
-    //   })
-    // })
-
+/*************** updateBoard ******************/
     this.socket.on('updateBoard', (data) => {
-     console.log('Socket:updateBoard - setting state in Home via updateBoard', data.edgeData)
-      console.log(data)
+      console.log('Socket:updateBoard - setting state in Home via updateBoard', data)
       this.setState({
         edgeData: data.edgeData,
-        players: data.players
+        players: data.players,
+        numCorrect: data.numCorrect,
+        numIncorrect: data.numIncorrect
       })
     })
   }
-
 
   puzzleSelectWrapper(size) {
     return () => {
@@ -93,7 +100,9 @@ class Home extends Component {
           <p className="lead" style={{display:"inline"}}>Share this URL to collaborate on this puzzle</p>
           <hr></hr>
           { this.state.problem &&
-            <Graph problem={this.state.problem} edgeData={this.state.edgeData} playerID={this.state.playerID} players={this.state.players}/>
+            <Graph problem={this.state.problem} edgeData={this.state.edgeData}
+            playerID={this.state.playerID} players={this.state.players} totSoln={this.state.totSoln}
+            numCorrect={this.state.numCorrect} numIncorrect={this.state.numIncorrect}/>
           }
           <div className="row">
             <div className="col-sm-2">

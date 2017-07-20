@@ -1,22 +1,12 @@
-import React, { PropTypes, Component } from 'react'
+import React, { PropTypes, PureComponent } from 'react'
 
-class Edge extends Component {
+class Edge extends PureComponent {
   constructor(props) {
     super(props);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    let returnState = false
-    Object.keys(nextProps).forEach((key) => {
-      if (this.props[key] != nextProps[key]){
-        returnState = true
-        return
-      }
-    })
-    return returnState
-  }
-
   render() {
+    // console.log('********** Edge', this.props.x, this.props.y, ' render **********')
     if (this.props.vertical) {
       this.x1 = this.props.x
       this.x2 = this.props.x

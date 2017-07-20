@@ -1,14 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import EdgeList from './EdgeList';
 
-const colorMap = {
-  0: 'black',
-  1: 'blue',
-  2: 'purple',
-  3: 'green',
-  4: 'red'
-}
-
 /**
   * the Grid class renders the slitherlink board
   */
@@ -89,14 +81,15 @@ class Grid extends Component {
     for (let [i, [x,y]] of this.centerList.entries()) {
       let symbol = problem[(y-1)/2][(x-1)/2]
       if (symbol != '.') {
-        this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1.0" textAnchor="middle" alignmentBaseline="middle" fontWeight="500" style={{cursor:'default'}}
-
-          key={i}>{symbol}</text>)
+        this.faceSVG.push(<text x={x} y={y} fill='black' fontSize="1.0"
+          textAnchor="middle" alignmentBaseline="middle" fontWeight="500"
+          style={{cursor:'default'}} key={i}>{symbol}</text>)
       }
     }
   }
 
   render() {
+    console.log('********** Grid render **********')
     return (
       <span className="border-top-0">
         <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>

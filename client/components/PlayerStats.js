@@ -12,8 +12,8 @@ const colorMap = {
 class PlayerStats extends Component {
   constructor(props) {
     super(props);
-
   }
+
   componentWillReceiveProps(nextProps) {
     // may need to update this if problem changes
   }
@@ -26,15 +26,18 @@ class PlayerStats extends Component {
   render() {
     // console.log('rendering PlayerStats', this.props.playerStats)
     let statsList = []
-    for (let player in this.props.playerStats) {
-      let stats = this.props.playerStats[player]
-      let color = colorMap[player]
+
+    Object.keys(this.props.players).map((key) => {
+      let playerNum = this.props.players[key].playerNum
+      let numSolve = this.props.players[key].numSolve
+      let color = colorMap[playerNum]
       statsList.push(
-        <div key={player}>
-          <i className="fa fa-user" aria-hidden="true" style={{color:color}}></i> &nbsp; {stats.numClick}
+        <div key={playerNum}>
+          <i className="fa fa-user" aria-hidden="true" style={{color:color}}></i> &nbsp; {numSolve}
         </div>
       )
-    }
+    })
+
     return (
       <div>
         <h3>Player Stats</h3>
