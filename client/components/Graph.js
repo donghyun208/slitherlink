@@ -24,9 +24,6 @@ class Graph extends Component {
   constructor(props) {
     super(props);
     this.onEdgeClick = this.onEdgeClick.bind(this)
-    // let totSoln = Object.keys(this.props.edgeData).reduce((prev, key) => {
-    //   return prev + this.props.edgeData[key].soln
-    // }
 
     this.state = {
       totSoln: this.props.totSoln,
@@ -43,27 +40,10 @@ class Graph extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (this.props.playerNum != nextProps.playerNum) {
-    //   console.log('updating player in Graph', this.props.playerNum , nextProps.playerNum)
-    //   this.setState({
-    //     playerNum: nextProps.playerNum
-    //   })
-    // }
-
-    // if (this.props.edgeData != nextProps.edgeData || this.props.players != nextProps.players ) {
-    //   this.state.edgeData = nextProps.edgeData
-    //   this.state.players = nextProps.players
-    //   this.updateState()
-    // }
-    // if (this.props.problem != nextProps.problem) {
-    //   this.updateState()
-    // }
-
     let completed = false
     if (nextProps.numIncorrect === 0 && nextProps.totSoln == nextProps.numCorrect) {
       let completed = true
     }
-
     this.setState({
       totSoln: nextProps.totSoln,
       edgeData: nextProps.edgeData,
@@ -87,35 +67,6 @@ class Graph extends Component {
   //     }
   //   })
   //   return shouldUpdate
-  // }
-
-  // updateState() {
-    // refactor to not loop -  also dont need to merge, can modifuy directly then call setState again
-    // merge new data with old state before updateing otherwise it erases all the old keys
-    // check if puzzle is correct
-    // let edgeData = update(this.state.edgeData, {$merge: newEdgeData})
-    // let edgeData = newEdgeData
-    // let edgeData = this.state.edgeData
-    // let currSoln = 0
-    // for (let key in edgeData) {
-    //   let owner = edgeData[key].owner
-    //   if (currSoln != -1 ) {
-    //     if (edgeData[key].soln == 0 && edgeData[key].click == 1){
-    //       currSoln = -1
-    //     }
-    //     if (edgeData[key].soln == 1 && edgeData[key].click == 1){
-    //       currSoln += 1
-    //     }
-    //   }
-    // }
-  //   console.log('Graph.updateState - setting state', this.state.edgeData)
-  //   this.setState({
-  //     edgeData: this.state.edgeData,
-  //     players: this.state.players,
-  //     numCorrect: this.state.numCorrect,
-  //     numIncorrect: this.state.numIncorrect,
-  //     completed: completed
-  //   })
   // }
 
   onEdgeClick(x,y) {
