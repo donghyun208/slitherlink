@@ -72,7 +72,7 @@ module.exports = (socket, io, roomList) => {
       puzzleType = '16_16_normal'
     else if (size == 18)
       puzzleType = '18_22_easy'
-    room.setNewPuzzle(puzzleType)
+    currRoom.setNewPuzzle(puzzleType)
     io.sockets.in(currRoom.id).emit('updateRoom', currRoom);
   })
 };
