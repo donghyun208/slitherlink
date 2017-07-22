@@ -4,10 +4,10 @@ const path = require('path')
 class Room {
   constructor(puzzleType) {
     this.id = idGen()
-    this.setNewPuzzle(puzzleType)
     this.players = {}
     this.numCorrect = 0
     this.numIncorrect = 0
+    this.setNewPuzzle(puzzleType)
   }
 
   addPlayer(playerID) {
@@ -33,6 +33,9 @@ class Room {
     this.totSoln = puzzle.totSoln
     this.numCorrect = 0
     this.numIncorrect = 0
+    Object.keys(this.players).map((key) => {
+      this.players[key].numSolve = 0
+    })
   }
 
   edgeClicked(playerNum, key, newClickState) {
