@@ -60,7 +60,7 @@ class Room {
       Object.keys(this.players).map((key) => {
         if (this.players[key].playerNum === playerNum) {
           this.players[key].numSolve += deltaNumSolve
-          if ('development' === app.settings.env) {
+          if (process.env.NODE_ENV === 'development') {
             console.log('edge ', key, ' clicked by ', playerNum, this.players[key].numSolve)
           }
         }
