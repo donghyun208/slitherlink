@@ -87,14 +87,17 @@ class Tutorial extends Component {
     if (initLines) {
       for (let [key, click] of initLines) {
         this.state.edgeData[key].click = click
-        if (this.state.edgeData[key].soln === 1) {
-          numCorrect += click === 1 ? 1:-1
-        }
-        else {
-          numIncorrect += click === 1 ? 1:-1
+        if (click === 1) {
+          if (this.state.edgeData[key].soln === 1) {
+            numCorrect += 1
+          }
+          else {
+            numIncorrect += 1
+          }
         }
       }
     }
+    console.log('init', numCorrect, numIncorrect, this.totSoln)
     let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
     this.setState({
       edgeData: this.state.edgeData,
@@ -107,6 +110,8 @@ class Tutorial extends Component {
         await sleep(delay);
         let prevClickState = this.state.edgeData[key].click
         let newClickState
+        let numCorrect = this.state.numCorrect
+        let numIncorrect = this.state.numIncorrect
         if (this.state.page !== currPage) {
           break
         }
@@ -136,7 +141,7 @@ class Tutorial extends Component {
             numIncorrect -= 1
           }
         }
-
+        console.log(numCorrect, numIncorrect, this.totSoln)
         let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
         this.setState({
           edgeData: this.state.edgeData,
@@ -284,21 +289,21 @@ class Tutorial extends Component {
               <div>
                 <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>
               </div>
+              <div className="row">
+                <div className="col-sm-4">
+                { this.state.page > 0 &&
+                  <Button color="secondary" onClick={this.goPrev} style={{visibility: this.state.page > 0 ? 'visible' : 'hidden'}}>Back</Button>
+                }
+                </div>
+                <div className="col-sm-4">
+                  <Button color="secondary" onClick={this.goNext}>{this.state.nextText}</Button>
+                </div>
+              </div>
             </div>
             <div className="col">
               <ul>
                 {this.state.instructions}
               </ul>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-sm-1">
-            { this.state.page > 0 &&
-              <Button color="secondary" onClick={this.goPrev} style={{visibility: this.state.page > 0 ? 'visible' : 'hidden'}}>Back</Button>
-            }
-            </div>
-            <div className="col-sm-1">
-              <Button color="secondary" onClick={this.goNext}>{this.state.nextText}</Button>
             </div>
           </div>
         </div>

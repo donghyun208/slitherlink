@@ -43302,10 +43302,12 @@ var Tutorial = function (_Component) {
                 click = _step$value[1];
 
             this.state.edgeData[key].click = click;
-            if (this.state.edgeData[key].soln === 1) {
-              numCorrect += click === 1 ? 1 : -1;
-            } else {
-              numIncorrect += click === 1 ? 1 : -1;
+            if (click === 1) {
+              if (this.state.edgeData[key].soln === 1) {
+                numCorrect += 1;
+              } else {
+                numIncorrect += 1;
+              }
             }
           }
         } catch (err) {
@@ -43323,6 +43325,7 @@ var Tutorial = function (_Component) {
           }
         }
       }
+      console.log('init', numCorrect, numIncorrect, this.totSoln);
       var completed = numCorrect == this.totSoln && numIncorrect == 0;
       this.setState({
         edgeData: this.state.edgeData,
@@ -43344,6 +43347,8 @@ var Tutorial = function (_Component) {
             await sleep(delay);
             var prevClickState = this.state.edgeData[key].click;
             var newClickState = void 0;
+            var _numCorrect = this.state.numCorrect;
+            var _numIncorrect = this.state.numIncorrect;
             if (this.state.page !== currPage) {
               break;
             }
@@ -43358,23 +43363,23 @@ var Tutorial = function (_Component) {
             }
             if (this.state.edgeData[key].soln === 1) {
               if (newClickState === 1) {
-                numCorrect += 1;
+                _numCorrect += 1;
               } else if (prevClickState === 1) {
-                numCorrect -= 1;
+                _numCorrect -= 1;
               }
             } else {
               if (newClickState === 1) {
-                numIncorrect += 1;
+                _numIncorrect += 1;
               } else if (prevClickState === 1) {
-                numIncorrect -= 1;
+                _numIncorrect -= 1;
               }
             }
-
-            var _completed = numCorrect == this.totSoln && numIncorrect == 0;
+            console.log(_numCorrect, _numIncorrect, this.totSoln);
+            var _completed = _numCorrect == this.totSoln && _numIncorrect == 0;
             this.setState({
               edgeData: this.state.edgeData,
-              numCorrect: numCorrect,
-              numIncorrect: numIncorrect,
+              numCorrect: _numCorrect,
+              numIncorrect: _numIncorrect,
               completed: _completed
             });
           }
@@ -43573,6 +43578,28 @@ var Tutorial = function (_Component) {
                   { style: { visibility: this.state.completed ? 'visible' : 'hidden' } },
                   'Complete'
                 )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'row' },
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-4' },
+                  this.state.page > 0 && _react2.default.createElement(
+                    _reactstrap.Button,
+                    { color: 'secondary', onClick: this.goPrev, style: { visibility: this.state.page > 0 ? 'visible' : 'hidden' } },
+                    'Back'
+                  )
+                ),
+                _react2.default.createElement(
+                  'div',
+                  { className: 'col-sm-4' },
+                  _react2.default.createElement(
+                    _reactstrap.Button,
+                    { color: 'secondary', onClick: this.goNext },
+                    this.state.nextText
+                  )
+                )
               )
             ),
             _react2.default.createElement(
@@ -43582,28 +43609,6 @@ var Tutorial = function (_Component) {
                 'ul',
                 null,
                 this.state.instructions
-              )
-            )
-          ),
-          _react2.default.createElement(
-            'div',
-            { className: 'row' },
-            _react2.default.createElement(
-              'div',
-              { className: 'col-sm-1' },
-              this.state.page > 0 && _react2.default.createElement(
-                _reactstrap.Button,
-                { color: 'secondary', onClick: this.goPrev, style: { visibility: this.state.page > 0 ? 'visible' : 'hidden' } },
-                'Back'
-              )
-            ),
-            _react2.default.createElement(
-              'div',
-              { className: 'col-sm-1' },
-              _react2.default.createElement(
-                _reactstrap.Button,
-                { color: 'secondary', onClick: this.goNext },
-                this.state.nextText
               )
             )
           )
