@@ -58,7 +58,6 @@ class Graph extends Component {
       let clickType = e.nativeEvent.which
       let prevClickState = this.state.edgeData[key].click
 
-
       if (process.env.NODE_ENV !== 'production') {
         console.log('\n\nclicked', key, prevClickState)
       }
@@ -170,10 +169,7 @@ Graph.contextTypes = {
 };
 
 function checkSolution(numCorrect, numIncorrect, totSoln) {
-  if (numIncorrect === 0 && (totSoln === numCorrect)) {
-    return true
-  }
-  return false
+  return (numIncorrect === 0) && (totSoln === numCorrect)
 }
 
 export default Graph

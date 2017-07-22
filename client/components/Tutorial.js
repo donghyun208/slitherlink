@@ -9,60 +9,67 @@ class Tutorial extends Component {
 
   constructor(props) {
     super(props);
-    this.text = 'hi'
+
     this.onEdgeClick = this.onEdgeClick.bind(this)
     this.goPrev = this.goPrev.bind(this)
     this.goNext = this.goNext.bind(this)
     this.problem = ".223,.3..,1203,..3."
-    let edgeData = { '1,0': { owner: 0, click: 0, soln: 1 },
-                     '3,0': { owner: 0, click: 0, soln: 0 },
-                     '5,0': { owner: 0, click: 0, soln: 1 },
-                     '7,0': { owner: 0, click: 0, soln: 1 },
-                     '0,1': { owner: 0, click: 0, soln: 1 },
-                     '2,1': { owner: 0, click: 0, soln: 1 },
-                     '4,1': { owner: 0, click: 0, soln: 1 },
-                     '6,1': { owner: 0, click: 0, soln: 0 },
-                     '8,1': { owner: 0, click: 0, soln: 1 },
-                     '1,2': { owner: 0, click: 0, soln: 0 },
-                     '3,2': { owner: 0, click: 0, soln: 0 },
-                     '5,2': { owner: 0, click: 0, soln: 0 },
-                     '7,2': { owner: 0, click: 0, soln: 1 },
-                     '0,3': { owner: 0, click: 0, soln: 1 },
-                     '2,3': { owner: 0, click: 0, soln: 1 },
-                     '4,3': { owner: 0, click: 0, soln: 1 },
-                     '6,3': { owner: 0, click: 0, soln: 1 },
-                     '8,3': { owner: 0, click: 0, soln: 0 },
-                     '1,4': { owner: 0, click: 0, soln: 0 },
-                     '3,4': { owner: 0, click: 0, soln: 1 },
-                     '5,4': { owner: 0, click: 0, soln: 0 },
-                     '7,4': { owner: 0, click: 0, soln: 1 },
-                     '0,5': { owner: 0, click: 0, soln: 1 },
-                     '2,5': { owner: 0, click: 0, soln: 0 },
-                     '4,5': { owner: 0, click: 0, soln: 0 },
-                     '6,5': { owner: 0, click: 0, soln: 0 },
-                     '8,5': { owner: 0, click: 0, soln: 1 },
-                     '1,6': { owner: 0, click: 0, soln: 0 },
-                     '3,6': { owner: 0, click: 0, soln: 1 },
-                     '5,6': { owner: 0, click: 0, soln: 0 },
-                     '7,6': { owner: 0, click: 0, soln: 1 },
-                     '0,7': { owner: 0, click: 0, soln: 1 },
-                     '2,7': { owner: 0, click: 0, soln: 1 },
-                     '4,7': { owner: 0, click: 0, soln: 1 },
-                     '6,7': { owner: 0, click: 0, soln: 1 },
-                     '8,7': { owner: 0, click: 0, soln: 0 },
-                     '1,8': { owner: 0, click: 0, soln: 1 },
-                     '3,8': { owner: 0, click: 0, soln: 0 },
-                     '5,8': { owner: 0, click: 0, soln: 1 },
-                     '7,8': { owner: 0, click: 0, soln: 0 } }
+    this.totSoln = 24
+    let edgeData = { '1,0': { owner: 1, click: 0, soln: 1 },
+                     '3,0': { owner: 1, click: 0, soln: 0 },
+                     '5,0': { owner: 1, click: 0, soln: 1 },
+                     '7,0': { owner: 1, click: 0, soln: 1 },
+                     '0,1': { owner: 1, click: 0, soln: 1 },
+                     '2,1': { owner: 1, click: 0, soln: 1 },
+                     '4,1': { owner: 1, click: 0, soln: 1 },
+                     '6,1': { owner: 1, click: 0, soln: 0 },
+                     '8,1': { owner: 1, click: 0, soln: 1 },
+                     '1,2': { owner: 1, click: 0, soln: 0 },
+                     '3,2': { owner: 1, click: 0, soln: 0 },
+                     '5,2': { owner: 1, click: 0, soln: 0 },
+                     '7,2': { owner: 1, click: 0, soln: 1 },
+                     '0,3': { owner: 1, click: 0, soln: 1 },
+                     '2,3': { owner: 1, click: 0, soln: 1 },
+                     '4,3': { owner: 1, click: 0, soln: 1 },
+                     '6,3': { owner: 1, click: 0, soln: 1 },
+                     '8,3': { owner: 1, click: 0, soln: 0 },
+                     '1,4': { owner: 1, click: 0, soln: 0 },
+                     '3,4': { owner: 1, click: 0, soln: 1 },
+                     '5,4': { owner: 1, click: 0, soln: 0 },
+                     '7,4': { owner: 1, click: 0, soln: 1 },
+                     '0,5': { owner: 1, click: 0, soln: 1 },
+                     '2,5': { owner: 1, click: 0, soln: 0 },
+                     '4,5': { owner: 1, click: 0, soln: 0 },
+                     '6,5': { owner: 1, click: 0, soln: 0 },
+                     '8,5': { owner: 1, click: 0, soln: 1 },
+                     '1,6': { owner: 1, click: 0, soln: 0 },
+                     '3,6': { owner: 1, click: 0, soln: 1 },
+                     '5,6': { owner: 1, click: 0, soln: 0 },
+                     '7,6': { owner: 1, click: 0, soln: 1 },
+                     '0,7': { owner: 1, click: 0, soln: 1 },
+                     '2,7': { owner: 1, click: 0, soln: 1 },
+                     '4,7': { owner: 1, click: 0, soln: 1 },
+                     '6,7': { owner: 1, click: 0, soln: 1 },
+                     '8,7': { owner: 1, click: 0, soln: 0 },
+                     '1,8': { owner: 1, click: 0, soln: 1 },
+                     '3,8': { owner: 1, click: 0, soln: 0 },
+                     '5,8': { owner: 1, click: 0, soln: 1 },
+                     '7,8': { owner: 1, click: 0, soln: 0 } }
 
-    this.instructionsText = ["The solution to the puzzle will be a single continuous loop, with no crossings.",
-                             "The number within a cell tells you how many of its sides will be touching the loop. Start by working near the 0's.",
-                             "Extend the loop outwards.",
-                             "Continue until the loop is complete. There will always be a unique solution to every puzzle."]
+    this.instructionsText = [[0, "The solution to the puzzle will be a single continuous loop."],
+                             [0, "The number within a cell tells you how many of its sides will be touching the loop."],
+                             [1, "Left click edges to draw the loop."],
+                             [1, "Right click (or long-press on mobile) an edge to indicate place where the loop cannot exist."],
+                             [2, "A good place to start the puzzle is near the 0's. We will begin by marking the edges surrounding the 0's with X's"],
+                             [3, "The two 3's adjacent to the 0 are now solvable as well."],
+                             [4, "Trial and error can help determine what the right path should be."],
+                             [5, "Continue extending the loop until it is complete. There will always be a unique solution to every puzzle."]]
     this.state = {
       page: 0,
       nextText: 'Next',
       edgeData: edgeData,
+      numCorrect: 0,
+      numIncorrect: 0,
       completed: false
     }
   }
@@ -70,88 +77,127 @@ class Tutorial extends Component {
     this.changePage(0)
   }
 
-  updateGraph(edgeData, lines, exes) {
-    for (let key in edgeData) {
-      if (lines.indexOf(key) > -1) {
-        edgeData[key].click = 1
+  async updateGraph(currPage, lines, initLines=null, delay=130) {
+
+    let numCorrect = 0
+    let numIncorrect = 0
+    Object.keys(this.state.edgeData).forEach(key => {
+      this.state.edgeData[key].click = 0
+    })
+    if (initLines) {
+      for (let [key, click] of initLines) {
+        this.state.edgeData[key].click = click
+        if (this.state.edgeData[key].soln === 1) {
+          numCorrect += click === 1 ? 1:-1
+        }
+        else {
+          numIncorrect += click === 1 ? 1:-1
+        }
       }
-      else if (exes.indexOf(key) > -1) {
-        edgeData[key].click = 2
-      }
-      else {
-        edgeData[key].click = 0
+    }
+    let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
+    this.setState({
+      edgeData: this.state.edgeData,
+      numCorrect: numCorrect,
+      numIncorrect: numIncorrect,
+      completed: completed
+    })
+    if (lines) {
+      for (let [key, click] of lines) {
+        await sleep(delay);
+        let prevClickState = this.state.edgeData[key].click
+        let newClickState
+        if (this.state.page !== currPage) {
+          break
+        }
+        this.state.edgeData[key].click = click
+
+        if (click === 1) {
+          // left click
+          newClickState = (prevClickState === 1) ? 0 : 1
+        }
+        else if (click === 2) {
+          // right click
+          newClickState = (prevClickState === 2) ? 0 : 2
+        }
+        if (this.state.edgeData[key].soln === 1) {
+          if (newClickState === 1) {
+            numCorrect += 1
+          }
+          else if (prevClickState === 1) {
+            numCorrect -= 1
+          }
+        }
+        else {
+          if (newClickState === 1) {
+            numIncorrect += 1
+          }
+          else if (prevClickState === 1) {
+            numIncorrect -= 1
+          }
+        }
+
+        let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
+        this.setState({
+          edgeData: this.state.edgeData,
+          numCorrect: numCorrect,
+          numIncorrect: numIncorrect,
+          completed: completed
+        })
       }
     }
   }
 
   changePage(page) {
-    let pageBulletDict = {0:1,1:2,2:2,3:3,4:3,5:4,6:4,7:4,}
     let nextText = 'Next'
-    let edgeData = this.state.edgeData
-    let numBullets = pageBulletDict[page]
-    let instructions = this.instructionsText.slice(0, numBullets).map((val, index) => {
-      return <li key={index}>{val}</li>
-    })
-    let completed = false
-    if (page == 0) {
-      for (let key in edgeData) {
-        if (edgeData[key].soln == 1) {
-          edgeData[key].click = 1
-        }
-        else {
-          edgeData[key].click = 0
-        }
+    let instructions = []
+
+    for (let [p, text] of this.instructionsText) {
+      if (p <= page){
+        instructions.push(<li key={text}>{text}</li>)
       }
-      completed = true
+    }
+
+    let lines, initLines
+    if (page == 0) {
+      lines = [["4,7", 1], ["5,8", 1], ["6,7", 1], ["7,6", 1], ["8,5", 1], ["7,4", 1],
+               ["6,3", 1], ["3,6", 1], ["8,1", 1], ["7,0", 1], ["4,3", 1], ["3,4", 1],
+               ["7,2", 1], ["5,0", 1], ["4,1", 1], ["2,3", 1], ["2,1", 1], ["1,0", 1],
+               ["0,1", 1], ["0,3", 1], ["0,5", 1], ["0,7", 1], ["1,8", 1], ["2,7", 1]]
+      this.updateGraph(page, lines)
     }
     if (page == 1) {
-      let exes = ["5,4","4,5","5,6","6,5"]
-      let lines = []
-      this.updateGraph(edgeData, lines, exes)
+      this.updateGraph(page)
     }
     if (page == 2) {
-      let exes = ["5,4","4,5","5,6","6,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4"]
-      this.updateGraph(edgeData, lines, exes)
+      lines = [["5,4", 2], ["4,5", 2], ["5,6", 2], ["6,5", 2]]
+      this.updateGraph(page, lines, null, 700)
     }
     if (page == 3) {
-      let exes = ["5,4","4,5","5,6","6,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4","6,3","3,6"]
-      this.updateGraph(edgeData, lines, exes)
+      initLines = [["5,4", 2], ["4,5", 2], ["5,6", 2], ["6,5", 2]]
+      lines = [["4,7", 1], ["5,8", 1], ["6,7", 1], ["7,6", 1], ["8,5", 1], ["7,4", 1], ["6,3", 1], ["3,6", 1]]
+      this.updateGraph(page, lines, initLines, 600)
     }
     if (page == 4) {
-      let exes = ["5,4","4,5","5,6","6,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4","6,3","3,6","8,1","7,0","4,3","3,4"]
-      this.updateGraph(edgeData, lines, exes)
+      initLines = [["5,4", 2], ["4,5", 2], ["5,6", 2], ["6,5", 2], ["4,7", 1], ["5,8", 1], ["6,7", 1], ["7,6", 1], ["8,5", 1], ["7,4", 1], ["6,3", 1], ["3,6", 1]]
+      lines = [["7,2", 2], ["6,1", 1], ["7,0", 1], ["8,1", 1], ["8,1", 0], ["7,0", 0], ["6,1", 0], ["7,2", 0],
+               ["7,2", 1], ["8,1", 1], ["7,0", 1], ["6,1", 2], ["5,2", 2], ["5,0", 1], ["4,1", 1]]
+      this.updateGraph(page, lines, initLines, 600)
     }
     if (page == 5) {
-      let exes = ["5,4","4,5","5,6","6,5","2,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4","6,3","3,6","8,1","7,0","4,3","3,4","7,2","5,0","4,1"]
-      this.updateGraph(edgeData, lines, exes)
-    }
-    if (page == 6) {
-      let exes = ["5,4","4,5","5,6","6,5","2,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4","6,3","3,6","8,1","7,0","4,3","3,4","7,2","5,0","4,1","2,3","2,1"]
-      this.updateGraph(edgeData, lines, exes)
-    }
-    if (page == 7) {
-      let exes = ["5,4","4,5","5,6","6,5","2,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4","6,3","3,6","8,1","7,0","4,3","3,4","7,2","5,0","4,1","2,3","2,1","1,0","0,1","0,3","0,5"]
-      this.updateGraph(edgeData, lines, exes)
-    }
-    if (page == 8) {
-      let exes = ["5,4","4,5","5,6","6,5","2,5"]
-      let lines = ["4,7","5,8","6,7","7,6","8,5","7,4","6,3","3,6","8,1","7,0","4,3","3,4","7,2","5,0","4,1","2,3","2,1","1,0","0,1","0,3","0,5","0,7","1,8","2,7"]
-      this.updateGraph(edgeData, lines, exes)
+      initLines = [["5,4", 2], ["4,5", 2], ["5,6", 2], ["6,5", 2], ["4,7", 1], ["5,8", 1], ["6,7", 1], ["7,6", 1],
+                   ["8,5", 1], ["7,4", 1], ["6,3", 1], ["3,6", 1], ["7,2", 1], ["8,1", 1], ["7,0", 1], ["6,1", 2],
+                   ["5,2", 2], ["5,0", 1], ["4,1", 1]]
+
+      lines = [["4,3", 1], ["3,4", 1], ["2,3", 1], ["3,2", 2], ["3,0", 2], ["2,1", 1], ["1,0", 1], ["0,1", 1], ["0,3", 1],
+               ["0,5", 1], ["1,6", 2], ["0,7", 1], ["1,8", 1], ["2,7", 1]]
+      this.updateGraph(page, lines, initLines, 700)
       nextText = 'Finish'
-      completed = true
     }
     this.setState({
       page: page,
       nextText: nextText,
-      edgeData: edgeData,
-      instructions: instructions,
-      completed: completed
+      instructions: instructions
     })
   }
 
@@ -161,7 +207,7 @@ class Tutorial extends Component {
 
   goNext() {
     let nextText = 'Next'
-    if (this.state.page == 8) {
+    if (this.state.page == 5) {
       this.props.history.push('/')
       return
     }
@@ -171,48 +217,53 @@ class Tutorial extends Component {
   onEdgeClick(x,y) {
     let key = String([x,y])
     return (e) => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('clicked', key)
-      }
-      let solnState = this.state.edgeData[key].soln
-      let clickState = this.state.edgeData[key].click
+      let clickType = e.nativeEvent.which
+      let prevClickState = this.state.edgeData[key].click
 
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('\n\nclicked', key, prevClickState)
+      }
       let newClickState = null
 
-      let clickType = e.nativeEvent.which
       if (clickType === 1) {
-        newClickState = (clickState === 1) ? 0 : 1
+        // left click
+        newClickState = (prevClickState === 1) ? 0 : 1
       }
       else if (clickType === 3) {
-        newClickState = (clickState === 2) ? 0 : 2
+        // right click
+        newClickState = (prevClickState === 2) ? 0 : 2
       }
       else {
         return
       }
 
-      let updatedEdgeData = {}
-      updatedEdgeData[key] = {click: newClickState,
-                              owner: 0,
-                              soln:  solnState}
-
-
-      let edgeData = update(this.state.edgeData, {$merge: updatedEdgeData})
-
-      let currSoln = 0
-      for (let key in edgeData) {
-        if (currSoln != -1 ) {
-          if (edgeData[key].soln == 0 && edgeData[key].click == 1){
-            currSoln = -1
-          }
-          if (edgeData[key].soln == 1 && edgeData[key].click == 1){
-            currSoln += 1
-          }
+      let numCorrect = this.state.numCorrect
+      let numIncorrect = this.state.numIncorrect
+      if (this.state.edgeData[key].soln === 1) {
+        if (newClickState === 1) {
+          numCorrect += 1
+        }
+        else if (prevClickState === 1) {
+          numCorrect -= 1
         }
       }
-      let completed = currSoln == 24 ? true: false
+      else {
+        if (newClickState === 1) {
+          numIncorrect += 1
+        }
+        else if (prevClickState === 1) {
+          numIncorrect -= 1
+        }
+      }
 
+      let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
+      console.log(numCorrect, numIncorrect, completed)
+      let newData = {}
+      newData[key] = {$merge: {click: newClickState}}
       this.setState({
-        edgeData: edgeData,
+        edgeData: update(this.state.edgeData, newData),
+        numCorrect: numCorrect,
+        numIncorrect: numIncorrect,
         completed: completed
       })
     }
@@ -259,5 +310,9 @@ class Tutorial extends Component {
 Tutorial.contextTypes = {
   socket: React.PropTypes.object
 };
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export default withRouter(Tutorial)
