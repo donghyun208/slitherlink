@@ -5,7 +5,9 @@ const clients = [];
 module.exports = (socket, io, roomList) => {
   // on connection, first join a random room.
   clients[socket.id] = socket;
-  console.log('connected')
+  if (process.env.NODE_ENV === 'development') {
+    console.log('connected')
+  }
   let debug = true;
   let currRoom = null;
   let playerID = null;
@@ -18,7 +20,9 @@ module.exports = (socket, io, roomList) => {
       // delete currRoom.players[socket.id]
       io.sockets.in(currRoom.id).emit('updating', currRoom);
     }
-    console.log('deleting')
+    if (process.env.NODE_ENV === 'development') {
+      console.log('deleting')
+    }
     delete clients[socket.id];
   });
 
@@ -28,7 +32,9 @@ module.exports = (socket, io, roomList) => {
   socket.on('roomID', (data) => {
     let roomID = data.roomID
     playerID = data.playerID
-    console.log('trying to join room: ' + roomID, playerID)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('trying to join room: ' + roomID, playerID)
+    }
     if (roomID !== '') {
       // try to join room
       if (roomID in roomList) {
@@ -46,7 +52,7 @@ module.exports = (socket, io, roomList) => {
       roomList[currRoom.id] = currRoom
     }
     currRoom.addPlayer(playerID)
-    if (debug) {
+    if (process.env.NODE_ENV === 'development') {
       console.log('done parsing room', currRoom)
     }
     socket.emit('updateRoom', currRoom)
@@ -76,7 +82,3 @@ module.exports = (socket, io, roomList) => {
     io.sockets.in(currRoom.id).emit('updateRoom', currRoom);
   })
 };
-
-
-
-

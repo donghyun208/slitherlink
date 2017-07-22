@@ -40,6 +40,9 @@ class Graph extends Component {
 
   componentWillReceiveProps(nextProps) {
     let completed = checkSolution(nextProps.numCorrect, nextProps.numIncorrect, nextProps.totSoln)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(nextProps.numCorrect, nextProps.numIncorrect, nextProps.totSoln)
+    }
     this.setState({
       edgeData: nextProps.edgeData,
       players: nextProps.players,
@@ -49,29 +52,16 @@ class Graph extends Component {
     })
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   let shouldUpdate = false
-  //   Object.keys(nextProps).forEach((key) => {
-  //     if (this.props[key] != nextProps[key]){
-  //       shouldUpdate = true
-  //     }
-  //   })
-  //   Object.keys(nextState).forEach((key) => {
-  //     if (this.state[key] != nextState[key]){
-  //       shouldUpdate = true
-  //     }
-  //   })
-  //   return shouldUpdate
-  // }
-
   onEdgeClick(x,y) {
     let key = String([x,y])
     return (e) => {
       let clickType = e.nativeEvent.which
       let prevClickState = this.state.edgeData[key].click
 
-      if (process.env.NODE_ENV !== 'production')
+
+      if (process.env.NODE_ENV !== 'production') {
         console.log('\n\nclicked', key, prevClickState)
+      }
       let owner = this.state.edgeData[key].owner
       let thisPlayer = this.state.players[this.props.playerID]
       let playerNum = thisPlayer.playerNum
@@ -131,6 +121,9 @@ class Graph extends Component {
       }
 
       let completed = checkSolution(numCorrect, numIncorrect, this.props.totSoln)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(numCorrect, numIncorrect, this.props.totSoln)
+      }
       let newData = {}
       newData[key] = {$merge: {click: newClickState, owner: playerNum}}
       this.setState({

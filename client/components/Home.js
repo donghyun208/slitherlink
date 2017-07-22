@@ -12,7 +12,6 @@ import { Button } from 'reactstrap';
   * socket.emit can be called from anywhere.
   */
 class Home extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -25,9 +24,6 @@ class Home extends Component {
     }
     this.puzzleSelectWrapper = this.puzzleSelectWrapper.bind(this);
     this.goTutorial = this.goTutorial.bind(this);
-    if (process.env.NODE_ENV === 'production') {
-      console.log('production build')
-    }
   }
 
   componentDidMount() {
@@ -58,8 +54,9 @@ class Home extends Component {
 
 /*************** updateRoom *******************/
     this.socket.on('updateRoom', (data) => {
-      if (process.env.NODE_ENV !== 'production')
+      if (process.env.NODE_ENV !== 'production') {
         console.log("\n\n\nSocket:updateRoom - Connected to room!");
+      }
       localStorage.setItem('slitherlink-roomID', data.id)
       this.setState({
         problem: data.problem,
@@ -74,8 +71,9 @@ class Home extends Component {
 
 /*************** updateBoard ******************/
     this.socket.on('updateBoard', (data) => {
-      if (process.env.NODE_ENV !== 'production')
+      if (process.env.NODE_ENV !== 'production') {
         console.log('Socket:updateBoard - setting state in Home via updateBoard', data)
+      }
       this.setState({
         edgeData: data.edgeData,
         players: data.players,

@@ -6,6 +6,12 @@ class Main extends Component {
   constructor(props) {
     super(props);
     this.socket = io();
+    if (process.env.NODE_ENV === 'production') {
+      console.log('production build')
+    }
+    else {
+      console.log('development build')
+    }
   }
 
   getChildContext() {

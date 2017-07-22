@@ -31,6 +31,8 @@ class Room {
     this.edgeData = puzzle.edgeData
     this.problem = puzzle.problem
     this.totSoln = puzzle.totSoln
+    this.numCorrect = 0
+    this.numIncorrect = 0
   }
 
   edgeClicked(playerNum, key, newClickState) {

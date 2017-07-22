@@ -171,7 +171,9 @@ class Tutorial extends Component {
   onEdgeClick(x,y) {
     let key = String([x,y])
     return (e) => {
-      console.log('clicked', key)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('clicked', key)
+      }
       let solnState = this.state.edgeData[key].soln
       let clickState = this.state.edgeData[key].click
 

@@ -27,6 +27,7 @@ const app = express();
 const server = http.createServer(app);
 
 if ('development' === app.settings.env) {
+  console.log('development environment')
   app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 }
 else if ('production' === app.settings.env) {
