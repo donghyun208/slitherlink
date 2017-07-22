@@ -10,9 +10,6 @@ class PuzzleSelector extends Component {
       dropdownOpen: false
     };
   }
-  componentWillReceiveProps(nextProps) {
-    // may need to update this if problem changes
-  }
 
   toggle() {
     this.setState({
@@ -28,11 +25,7 @@ class PuzzleSelector extends Component {
         </DropdownToggle>
         <DropdownMenu>
           <DropdownItem header>Puzzle size</DropdownItem>
-          {/*<DropdownItem disabled>Action</DropdownItem>
-          <DropdownItem onClick={this.selectWrapper(8)}>8x8</DropdownItem>
-          */}
           <DropdownItem onClick={this.props.onClickWrapper(12)}>12x12</DropdownItem>
-          {/*<DropdownItem divider />*/}
           <DropdownItem onClick={this.props.onClickWrapper(16)}>16x16</DropdownItem>
           <DropdownItem onClick={this.props.onClickWrapper(18)}>18x22</DropdownItem>
         </DropdownMenu>
@@ -42,13 +35,3 @@ class PuzzleSelector extends Component {
 };
 
 export default PuzzleSelector
-      // <div className="dropdown">
-      //   <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" dataToggle="dropdown" ariaHaspopup="true" ariaExpanded="false">
-      //     Dropdown button
-      //   </button>
-      //   <div className="dropdown-menu" ariaLabelledby="dropdownMenuButton">
-      //     <a className="dropdown-item" href="#">Action</a>
-      //     <a className="dropdown-item" href="#">Another action</a>
-      //     <a className="dropdown-item" href="#">Something else here</a>
-      //   </div>
-      // </div>

@@ -6,7 +6,6 @@ class Edge extends PureComponent {
   }
 
   render() {
-    // console.log('********** Edge', this.props.x, this.props.y, ' render **********')
     if (this.props.vertical) {
       this.x1 = this.props.x
       this.x2 = this.props.x

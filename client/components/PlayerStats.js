@@ -14,17 +14,7 @@ class PlayerStats extends Component {
     super(props);
   }
 
-  componentWillReceiveProps(nextProps) {
-    // may need to update this if problem changes
-  }
-
-
-        // <span key={{player}}>
-        //   <i className="fa fa-user" aria-hidden="true" style={{color:color}}></i>
-        //   <h4>{stats.numClick}</h4>
-        // </span>
   render() {
-    // console.log('rendering PlayerStats', this.props.playerStats)
     let statsList = []
 
     Object.keys(this.props.players).map((key) => {

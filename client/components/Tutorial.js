@@ -153,7 +153,6 @@ class Tutorial extends Component {
       instructions: instructions,
       completed: completed
     })
-    console.log(this.state)
   }
 
   goPrev() {
@@ -218,7 +217,6 @@ class Tutorial extends Component {
   }
 
   render() {
-    console.log(this.state.completed)
     return (
       <div className="pb-4 pt-2">
         <div className="container pt-2">

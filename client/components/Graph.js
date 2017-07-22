@@ -26,7 +26,6 @@ class Graph extends Component {
     this.onEdgeClick = this.onEdgeClick.bind(this)
 
     this.state = {
-      totSoln: this.props.totSoln,
       edgeData: this.props.edgeData,
       players: this.props.players,
       numCorrect: this.props.numCorrect,
@@ -40,12 +39,8 @@ class Graph extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let completed = false
-    if (nextProps.numIncorrect === 0 && nextProps.totSoln == nextProps.numCorrect) {
-      let completed = true
-    }
+    let completed = checkSolution(nextProps.numCorrect, nextProps.numIncorrect, nextProps.totSoln)
     this.setState({
-      totSoln: nextProps.totSoln,
       edgeData: nextProps.edgeData,
       players: nextProps.players,
       numCorrect: nextProps.numCorrect,
@@ -74,7 +69,9 @@ class Graph extends Component {
     return (e) => {
       let clickType = e.nativeEvent.which
       let prevClickState = this.state.edgeData[key].click
-      console.log('\n\nclicked', key, prevClickState)
+
+      if (process.env.NODE_ENV !== 'production')
+        console.log('\n\nclicked', key, prevClickState)
       let owner = this.state.edgeData[key].owner
       let thisPlayer = this.state.players[this.props.playerID]
       let playerNum = thisPlayer.playerNum
@@ -114,30 +111,33 @@ class Graph extends Component {
       }
 
       // check solution
-      // console.log('edgedatakey', this.state.edgeData[key], newClickState, prevClickState)
+      let numCorrect = this.state.numCorrect
+      let numIncorrect = this.state.numIncorrect
       if (this.state.edgeData[key].soln === 1) {
         if (newClickState === 1) {
-          this.setState({numCorrect: this.state.numCorrect + 1})
+          numCorrect += 1
         }
         else if (prevClickState === 1) {
-          this.setState({numCorrect: this.state.numCorrect - 1})
+          numCorrect -= 1
         }
       }
       else {
         if (newClickState === 1) {
-          this.setState({numIncorrect: this.state.numIncorrect + 1})
+          numIncorrect += 1
         }
         else if (prevClickState === 1) {
-          this.setState({numIncorrect: this.state.numIncorrect - 1})
+          numIncorrect -= 1
         }
       }
 
-
-      console.log('updating edges via edgeClick')
+      let completed = checkSolution(numCorrect, numIncorrect, this.props.totSoln)
       let newData = {}
       newData[key] = {$merge: {click: newClickState, owner: playerNum}}
       this.setState({
-        edgeData: update(this.state.edgeData, newData)
+        edgeData: update(this.state.edgeData, newData),
+        numCorrect: numCorrect,
+        numIncorrect: numIncorrect,
+        completed: completed
       })
 
       this.socket.emit('edgeClicked', {
@@ -149,7 +149,8 @@ class Graph extends Component {
   }
 
   render() {
-    console.log('********** Graph render **********')
+    if (process.env.NODE_ENV !== 'production')
+      console.log('********** Graph render **********')
     return (
       <div className="row">
         <div className="col-sm-9">
@@ -174,5 +175,12 @@ class Graph extends Component {
 Graph.contextTypes = {
   socket: React.PropTypes.object
 };
+
+function checkSolution(numCorrect, numIncorrect, totSoln) {
+  if (numIncorrect === 0 && (totSoln === numCorrect)) {
+    return true
+  }
+  return false
+}
 
 export default Graph

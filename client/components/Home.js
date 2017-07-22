@@ -25,7 +25,9 @@ class Home extends Component {
     }
     this.puzzleSelectWrapper = this.puzzleSelectWrapper.bind(this);
     this.goTutorial = this.goTutorial.bind(this);
-    console.log('home')
+    if (process.env.NODE_ENV === 'production') {
+      console.log('production build')
+    }
   }
 
   componentDidMount() {
@@ -35,7 +37,7 @@ class Home extends Component {
 
   initSockets() {
 /*********** get local storage data ***********/
-    console.log('the original room-url', this.props.match.params.roomID)
+    console.log('room-url', this.props.match.params.roomID)
     let roomID = this.props.match.params.roomID
     if (roomID == undefined) {
       roomID = localStorage.getItem('slitherlink-roomID')
@@ -56,7 +58,8 @@ class Home extends Component {
 
 /*************** updateRoom *******************/
     this.socket.on('updateRoom', (data) => {
-      console.log("\n\n\nSocket:updateRoom - Connected to room!", data);
+      if (process.env.NODE_ENV !== 'production')
+        console.log("\n\n\nSocket:updateRoom - Connected to room!");
       localStorage.setItem('slitherlink-roomID', data.id)
       this.setState({
         problem: data.problem,
@@ -71,7 +74,8 @@ class Home extends Component {
 
 /*************** updateBoard ******************/
     this.socket.on('updateBoard', (data) => {
-      console.log('Socket:updateBoard - setting state in Home via updateBoard', data)
+      if (process.env.NODE_ENV !== 'production')
+        console.log('Socket:updateBoard - setting state in Home via updateBoard', data)
       this.setState({
         edgeData: data.edgeData,
         players: data.players,

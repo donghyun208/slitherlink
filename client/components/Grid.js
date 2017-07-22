@@ -89,7 +89,8 @@ class Grid extends Component {
   }
 
   render() {
-    console.log('********** Grid render **********')
+    if (process.env.NODE_ENV !== 'production')
+      console.log('********** Grid render **********')
     return (
       <span className="border-top-0">
         <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>

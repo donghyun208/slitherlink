@@ -21,33 +21,6 @@ class EdgeList extends Component {
       this.assignClickFcns(nextProps.edgeList)
       this.forceUpdate()
     }
-    // else {
-
-      // console.log('edgelist receiving props')
-      // let key = String([0,1])
-      // let prevEdge = this.props.edgeData[key]
-      // Object.keys(prevEdge).forEach((key) => {
-      //   console.log(key)
-      // })
-      // let nextEdge = nextProps.edgeData[key]
-      // console.log(prevEdge, nextEdge)
-      // nextProps.edgeList.map(([x,y], i) => {
-      //   let key = String([x,y])
-      //   let prevEdge = this.props.edgeData[key]
-      //   let nextEdge = nextProps.edgeData[key]
-      //   // Object.keys(nextEdge).forEach((key) => {
-      //   //   if (prevEdge.owner !== nextEdge.owner) {
-      //   //     this.edgeSVG[i].props['color'] = colorMap[nextEdge.owner]
-      //   //   }
-      //   //   if (prevEdge.click !== nextEdge.click) {
-      //   //     this.edgeSVG[i].props.clickState = nextEdge.click
-      //   //   }
-      //   //   if (prevEdge[key] != nextEdge[key]) {
-      //   //     console.log('**elist', key, prevEdge[key], this.edgeSVG[i])
-      //   //   }
-      //   // })
-      // })
-    // }
   }
 
   assignClickFcns(edgeList){
@@ -57,9 +30,9 @@ class EdgeList extends Component {
   }
 
   render() {
-    console.log('********** EdgeList render **********')
+    if (process.env.NODE_ENV !== 'production')
+      console.log('********** EdgeList render **********')
     let edgeSVG = this.props.edgeList.map(([x,y], i) => {
-      // console.log(i)
       let vertical = (x % 2 == 0)
       let key = String([x,y])
       let thisEdge = this.props.edgeData[key]
