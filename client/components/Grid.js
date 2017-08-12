@@ -57,28 +57,26 @@ class Grid extends Component {
     let problem = problemStr.split(',')
     let numY = problem.length
     let numX = problem[0].length
-    this.xOffset = 1
-    this.yOffset = 1
     this.scaleFactor = 16
 
     // multiply by 2 because every face is 2 units by 2 units
-    this.gridXOffset = 2
-    this.gridYOffset = 2
-    this.gridWidth = (numX + this.xOffset) * 2 * this.scaleFactor - this.gridXOffset * 2
-    this.gridHeight = (numY + this.yOffset) * 2 * this.scaleFactor - this.gridYOffset * 2
-    this.svgWidth = this.gridWidth + 4
-    this.svgHeight = this.gridHeight + 18
+    this.borderOffset = 1.4
+    this.margin = 2
+    this.gridWidth = (numX + this.borderOffset) * 2 * this.scaleFactor
+    this.gridHeight = (numY + this.borderOffset) * 2 * this.scaleFactor
+    this.svgWidth = this.gridWidth + this.margin * 2
+    this.svgHeight = this.gridHeight + this.margin * 2 + 14
 
-    let start = [this.gridXOffset + this.gridWidth / 2 , this.gridYOffset]
+    let start = [this.margin + this.gridWidth / 2 , this.margin]
     let halfWidth = this.gridWidth / 2
-    let halfWidthBottom = this.gridWidth / 2 - 42
+    let halfWidthBottom = this.gridWidth / 2 - 52
 
     this.pathDRight = 'M' + start[0] + ',' + start[1] + 'h' + halfWidth + 'v' + this.gridHeight + 'h-' + halfWidthBottom
     this.pathDLeft = 'M' + start[0] + ',' + start[1] + 'h-' + halfWidth + 'v' + this.gridHeight + 'h' + halfWidthBottom
     let totLengthStr = String(halfWidth + this.gridHeight + halfWidthBottom)
 
-    this.completeX = this.gridXOffset + halfWidth
-    this.completeY = this.gridYOffset + this.gridHeight
+    this.completeX = this.margin + halfWidth
+    this.completeY = this.margin + this.gridHeight
 
     this.pathCSS_win = {
       'opacity': '1',
@@ -142,7 +140,7 @@ class Grid extends Component {
       <span className="border-top-0">
         <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>
           <g>
-            <rect className={this.borderClass + ' border'} x={this.gridXOffset} y={this.gridYOffset} height={this.gridHeight} width={this.gridWidth}/>
+            <rect className={this.borderClass + ' border'} x={this.margin} y={this.margin} height={this.gridHeight} width={this.gridWidth}/>
             <path className='path' d={this.pathDRight} style={this.pathCSS}/>
             <path className='path' d={this.pathDLeft} style={this.pathCSS}/>
           </g>
@@ -150,7 +148,7 @@ class Grid extends Component {
           <text className={this.textClass + " complete-text"} x={this.completeX} y={this.completeY} >complete</text>
 
           <g className="prevent-highlight"
-          transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
+          transform={"scale(" + this.scaleFactor + ") translate(" + this.borderOffset + " " + this.borderOffset  + ")"}>
             {this.vertexSVG}
             {this.faceSVG}
             <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper} problem={this.props.problem}/>
