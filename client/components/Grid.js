@@ -60,10 +60,11 @@ class Grid extends Component {
     this.scaleFactor = 16
 
     // multiply by 2 because every face is 2 units by 2 units
-    this.borderOffset = 1.4
     this.margin = 2
-    this.gridWidth = (numX + this.borderOffset) * 2 * this.scaleFactor
-    this.gridHeight = (numY + this.borderOffset) * 2 * this.scaleFactor
+    let borderOffset = 1
+    this.originTranslate = this.margin / this.scaleFactor + borderOffset
+    this.gridWidth = (numX + borderOffset) * 2 * this.scaleFactor
+    this.gridHeight = (numY + borderOffset) * 2 * this.scaleFactor
     this.svgWidth = this.gridWidth + this.margin * 2
     this.svgHeight = this.gridHeight + this.margin * 2 + 14
 
@@ -139,19 +140,18 @@ class Grid extends Component {
     return (
       <span className="border-top-0">
         <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>
-          <g>
-            <rect className={this.borderClass + ' border'} x={this.margin} y={this.margin} height={this.gridHeight} width={this.gridWidth}/>
-            <path className='path' d={this.pathDRight} style={this.pathCSS}/>
-            <path className='path' d={this.pathDLeft} style={this.pathCSS}/>
-          </g>
-
-          <text className={this.textClass + " complete-text"} x={this.completeX} y={this.completeY} >complete</text>
-
-          <g className="prevent-highlight"
-          transform={"scale(" + this.scaleFactor + ") translate(" + this.borderOffset + " " + this.borderOffset  + ")"}>
-            {this.vertexSVG}
-            {this.faceSVG}
-            <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper} problem={this.props.problem}/>
+          <g className="prevent-highlight">
+            <g>
+              <rect className={this.borderClass + ' border'} x={this.margin} y={this.margin} height={this.gridHeight} width={this.gridWidth}/>
+              <path className='path' d={this.pathDRight} style={this.pathCSS}/>
+              <path className='path' d={this.pathDLeft} style={this.pathCSS}/>
+            </g>
+            <text className={this.textClass + " complete-text"} x={this.completeX} y={this.completeY} >complete</text>
+            <g transform={"scale(" + this.scaleFactor + ") translate(" + this.originTranslate + " " + this.originTranslate  + ")"}>
+              {this.vertexSVG}
+              {this.faceSVG}
+              <EdgeList edgeList={this.edgeList} edgeData={this.props.edgeData} halfLength={0.8} onClickWrapper={this.props.onClickWrapper} problem={this.props.problem}/>
+            </g>
           </g>
         </svg>
       </span>
