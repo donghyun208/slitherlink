@@ -97,7 +97,6 @@ class Tutorial extends Component {
         }
       }
     }
-    console.log('init', numCorrect, numIncorrect, this.totSoln)
     let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
     this.setState({
       edgeData: this.state.edgeData,
@@ -141,7 +140,6 @@ class Tutorial extends Component {
             numIncorrect -= 1
           }
         }
-        console.log(numCorrect, numIncorrect, this.totSoln)
         let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
         this.setState({
           edgeData: this.state.edgeData,
@@ -262,7 +260,6 @@ class Tutorial extends Component {
       }
 
       let completed = (numCorrect == this.totSoln) && (numIncorrect == 0)
-      console.log(numCorrect, numIncorrect, completed)
       let newData = {}
       newData[key] = {$merge: {click: newClickState}}
       this.setState({

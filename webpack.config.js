@@ -1,6 +1,6 @@
-var LiveReloadPlugin = require('webpack-livereload-plugin');
-var LiveReloadPluginConfig = new LiveReloadPlugin()
-
+const LiveReloadPlugin = require('webpack-livereload-plugin');
+const LiveReloadPluginConfig = new LiveReloadPlugin()
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   entry: [
@@ -15,10 +15,7 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: [/node_modules/, /server/],
-        loader: "babel-loader",
-        query: {
-          presets: ['es2015']
-        }
+        loader: "babel-loader"
       },
       {
         test: /\.css$/,
@@ -27,5 +24,10 @@ module.exports = {
       }
     ]
   },
-  plugins: [LiveReloadPluginConfig]
+  plugins: [LiveReloadPluginConfig, new UglifyJSPlugin({
+    parallel: {
+      cache: true,
+      workers: 4
+    }
+  })]
 }
