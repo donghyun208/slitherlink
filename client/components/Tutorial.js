@@ -58,8 +58,8 @@ class Tutorial extends Component {
 
     this.instructionsText = [[0, "The solution to the puzzle will be a single continuous loop."],
                              [0, "The number within a cell tells you how many of its sides will be touching the loop."],
-                             [1, "Left click edges to draw the loop."],
-                             [1, "Right click (or long-press on mobile) an edge to indicate place where the loop cannot exist."],
+                             [1, "Left click edges to place a line, which indicates that the edge is a part of the loop."],
+                             [1, "Right click (or long-press on mobile) an edge to place an \"X\", indicating that the loop will not touch that edge."],
                              [2, "A good place to start the puzzle is near the 0's. We will begin by marking the edges surrounding the 0's with X's"],
                              [3, "The two 3's adjacent to the 0 are now solvable as well."],
                              [4, "Trial and error can help determine what the right path should be."],
@@ -286,9 +286,6 @@ class Tutorial extends Component {
             <div className="col-sm-3">
               <Grid problem={this.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick} completed={this.state.completed}>
               </Grid>
-              <div>
-                <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>
-              </div>
               <div className="row">
                 <div className="col-sm-4">
                 { this.state.page > 0 &&

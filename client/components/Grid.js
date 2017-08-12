@@ -8,6 +8,10 @@ class Grid extends Component {
   constructor(props) {
     super(props);
     this.constructGrid(this.props.problem)
+    this.animate = null
+    this.borderClass = "border-notwin"
+    this.pathCSS = this.pathCSS_notwin
+    this.textClass = "complete-text-notwin"
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -18,7 +22,24 @@ class Grid extends Component {
     if (nextProps.problem != this.props.problem) {
       this.constructGrid(nextProps.problem)
     }
+    if (nextProps.completed != this.props.completed) {
+      this.completedAnimation(nextProps.completed)
+    }
   }
+
+  completedAnimation(completed) {
+    if (completed) {
+      this.borderClass = "border-win"
+      this.pathCSS = this.pathCSS_win
+      this.textClass = "complete-text-win"
+    }
+    else {
+      this.borderClass = "border-notwin"
+      this.pathCSS = this.pathCSS_notwin
+      this.textClass = "complete-text-notwin"
+    }
+  }
+
 
   constructGrid(problemStr) {
     /*
@@ -41,9 +62,35 @@ class Grid extends Component {
     this.scaleFactor = 16
 
     // multiply by 2 because every face is 2 units by 2 units
-    this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor
-    this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor
+    this.gridXOffset = 2
+    this.gridYOffset = 2
+    this.gridWidth = (numX + this.xOffset) * 2 * this.scaleFactor - this.gridXOffset * 2
+    this.gridHeight = (numY + this.yOffset) * 2 * this.scaleFactor - this.gridYOffset * 2
+    this.svgWidth = this.gridWidth + 4
+    this.svgHeight = this.gridHeight + 18
 
+    let start = [this.gridXOffset + this.gridWidth / 2 , this.gridYOffset]
+    let halfWidth = this.gridWidth / 2
+    let halfWidthBottom = this.gridWidth / 2 - 42
+
+    this.pathDRight = 'M' + start[0] + ',' + start[1] + 'h' + halfWidth + 'v' + this.gridHeight + 'h-' + halfWidthBottom
+    this.pathDLeft = 'M' + start[0] + ',' + start[1] + 'h-' + halfWidth + 'v' + this.gridHeight + 'h' + halfWidthBottom
+    let totLengthStr = String(halfWidth + this.gridHeight + halfWidthBottom)
+
+    this.completeX = this.gridXOffset + halfWidth
+    this.completeY = this.gridYOffset + this.gridHeight
+
+    this.pathCSS_win = {
+      'opacity': '1',
+      'strokeDasharray': totLengthStr + ' ' + totLengthStr,
+      'strokeDashoffset': '0.00',
+      'transition': 'stroke-dashoffset 1s ease-in-out'
+    }
+
+    this.pathCSS_notwin = {
+      'opacity': '0',
+      'strokeDashoffset': totLengthStr
+    }
     let xList = []
     let yList = []
 
@@ -94,9 +141,14 @@ class Grid extends Component {
     return (
       <span className="border-top-0">
         <svg  width={this.svgWidth + "px"} height={this.svgHeight + "px"} onContextMenu={(e) => {e.preventDefault()}}>
-          <g stroke={this.props.completed ? 'green' : 'black'}>
-            <rect x={0} y={0} height={this.svgHeight} width={this.svgWidth}  fill='none' strokeWidth='4'/>
+          <g>
+            <rect className={this.borderClass + ' border'} x={this.gridXOffset} y={this.gridYOffset} height={this.gridHeight} width={this.gridWidth}/>
+            <path className='path' d={this.pathDRight} style={this.pathCSS}/>
+            <path className='path' d={this.pathDLeft} style={this.pathCSS}/>
           </g>
+
+          <text className={this.textClass + " complete-text"} x={this.completeX} y={this.completeY} >complete</text>
+
           <g className="prevent-highlight"
           transform={"scale(" + this.scaleFactor + ") translate(" + this.xOffset + " " + this.yOffset  + ")"}>
             {this.vertexSVG}

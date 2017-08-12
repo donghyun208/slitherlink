@@ -19216,16 +19216,7 @@ var Graph = function (_Component) {
           _react2.default.createElement(
             'div',
             { className: '' },
-            _react2.default.createElement(_Grid2.default, { problem: this.props.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick, completed: this.state.completed }),
-            _react2.default.createElement(
-              'div',
-              null,
-              _react2.default.createElement(
-                'h3',
-                { style: { visibility: this.state.completed ? 'visible' : 'hidden' } },
-                'Complete'
-              )
-            )
+            _react2.default.createElement(_Grid2.default, { problem: this.props.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick, completed: this.state.completed })
           )
         ),
         _react2.default.createElement(
@@ -19300,6 +19291,10 @@ var Grid = function (_Component) {
     var _this = _possibleConstructorReturn(this, (Grid.__proto__ || Object.getPrototypeOf(Grid)).call(this, props));
 
     _this.constructGrid(_this.props.problem);
+    _this.animate = null;
+    _this.borderClass = "border-notwin";
+    _this.pathCSS = _this.pathCSS_notwin;
+    _this.textClass = "complete-text-notwin";
     return _this;
   }
 
@@ -19313,6 +19308,22 @@ var Grid = function (_Component) {
     value: function componentWillReceiveProps(nextProps) {
       if (nextProps.problem != this.props.problem) {
         this.constructGrid(nextProps.problem);
+      }
+      if (nextProps.completed != this.props.completed) {
+        this.completedAnimation(nextProps.completed);
+      }
+    }
+  }, {
+    key: 'completedAnimation',
+    value: function completedAnimation(completed) {
+      if (completed) {
+        this.borderClass = "border-win";
+        this.pathCSS = this.pathCSS_win;
+        this.textClass = "complete-text-win";
+      } else {
+        this.borderClass = "border-notwin";
+        this.pathCSS = this.pathCSS_notwin;
+        this.textClass = "complete-text-notwin";
       }
     }
   }, {
@@ -19335,9 +19346,35 @@ var Grid = function (_Component) {
       this.scaleFactor = 16;
 
       // multiply by 2 because every face is 2 units by 2 units
-      this.svgWidth = (numX + this.xOffset) * 2 * this.scaleFactor;
-      this.svgHeight = (numY + this.yOffset) * 2 * this.scaleFactor;
+      this.gridXOffset = 2;
+      this.gridYOffset = 2;
+      this.gridWidth = (numX + this.xOffset) * 2 * this.scaleFactor - this.gridXOffset * 2;
+      this.gridHeight = (numY + this.yOffset) * 2 * this.scaleFactor - this.gridYOffset * 2;
+      this.svgWidth = this.gridWidth + 4;
+      this.svgHeight = this.gridHeight + 18;
 
+      var start = [this.gridXOffset + this.gridWidth / 2, this.gridYOffset];
+      var halfWidth = this.gridWidth / 2;
+      var halfWidthBottom = this.gridWidth / 2 - 42;
+
+      this.pathDRight = 'M' + start[0] + ',' + start[1] + 'h' + halfWidth + 'v' + this.gridHeight + 'h-' + halfWidthBottom;
+      this.pathDLeft = 'M' + start[0] + ',' + start[1] + 'h-' + halfWidth + 'v' + this.gridHeight + 'h' + halfWidthBottom;
+      var totLengthStr = String(halfWidth + this.gridHeight + halfWidthBottom);
+
+      this.completeX = this.gridXOffset + halfWidth;
+      this.completeY = this.gridYOffset + this.gridHeight;
+
+      this.pathCSS_win = {
+        'opacity': '1',
+        'strokeDasharray': totLengthStr + ' ' + totLengthStr,
+        'strokeDashoffset': '0.00',
+        'transition': 'stroke-dashoffset 1s ease-in-out'
+      };
+
+      this.pathCSS_notwin = {
+        'opacity': '0',
+        'strokeDashoffset': totLengthStr
+      };
       var xList = [];
       var yList = [];
 
@@ -19488,8 +19525,15 @@ var Grid = function (_Component) {
             } },
           _react2.default.createElement(
             'g',
-            { stroke: this.props.completed ? 'green' : 'black' },
-            _react2.default.createElement('rect', { x: 0, y: 0, height: this.svgHeight, width: this.svgWidth, fill: 'none', strokeWidth: '4' })
+            null,
+            _react2.default.createElement('rect', { className: this.borderClass + ' border', x: this.gridXOffset, y: this.gridYOffset, height: this.gridHeight, width: this.gridWidth }),
+            _react2.default.createElement('path', { className: 'path', d: this.pathDRight, style: this.pathCSS }),
+            _react2.default.createElement('path', { className: 'path', d: this.pathDLeft, style: this.pathCSS })
+          ),
+          _react2.default.createElement(
+            'text',
+            { className: this.textClass + " complete-text", x: this.completeX, y: this.completeY },
+            'complete'
           ),
           _react2.default.createElement(
             'g',
@@ -43259,7 +43303,7 @@ var Tutorial = function (_Component) {
       '5,8': { owner: 1, click: 0, soln: 1 },
       '7,8': { owner: 1, click: 0, soln: 0 } };
 
-    _this.instructionsText = [[0, "The solution to the puzzle will be a single continuous loop."], [0, "The number within a cell tells you how many of its sides will be touching the loop."], [1, "Left click edges to draw the loop."], [1, "Right click (or long-press on mobile) an edge to indicate place where the loop cannot exist."], [2, "A good place to start the puzzle is near the 0's. We will begin by marking the edges surrounding the 0's with X's"], [3, "The two 3's adjacent to the 0 are now solvable as well."], [4, "Trial and error can help determine what the right path should be."], [5, "Continue extending the loop until it is complete. There will always be a unique solution to every puzzle."]];
+    _this.instructionsText = [[0, "The solution to the puzzle will be a single continuous loop."], [0, "The number within a cell tells you how many of its sides will be touching the loop."], [1, "Left click edges to place a line, which indicates that the edge is a part of the loop."], [1, "Right click (or long-press on mobile) an edge to place an \"X\", indicating that the loop will not touch that edge."], [2, "A good place to start the puzzle is near the 0's. We will begin by marking the edges surrounding the 0's with X's"], [3, "The two 3's adjacent to the 0 are now solvable as well."], [4, "Trial and error can help determine what the right path should be."], [5, "Continue extending the loop until it is complete. There will always be a unique solution to every puzzle."]];
     _this.state = {
       page: 0,
       nextText: 'Next',
@@ -43570,15 +43614,6 @@ var Tutorial = function (_Component) {
               'div',
               { className: 'col-sm-3' },
               _react2.default.createElement(_Grid2.default, { problem: this.problem, edgeData: this.state.edgeData, graph: "", onClickWrapper: this.onEdgeClick, completed: this.state.completed }),
-              _react2.default.createElement(
-                'div',
-                null,
-                _react2.default.createElement(
-                  'h3',
-                  { style: { visibility: this.state.completed ? 'visible' : 'hidden' } },
-                  'Complete'
-                )
-              ),
               _react2.default.createElement(
                 'div',
                 { className: 'row' },

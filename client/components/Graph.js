@@ -149,9 +149,6 @@ class Graph extends Component {
           <div className="">
             <Grid problem={this.props.problem} edgeData={this.state.edgeData} graph={""} onClickWrapper={this.onEdgeClick} completed={this.state.completed}>
             </Grid>
-            <div>
-              <h3 style={{visibility: this.state.completed ? 'visible' : 'hidden'}}>Complete</h3>
-            </div>
           </div>
         </div>
         <div className="col-sm-3">
